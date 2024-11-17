@@ -8,16 +8,7 @@ function Login() {
         alert('doIt()');
     }
     return (
-        <div id="loginDiv">
-            {/* <span id="inner-title">Login with Spotify</span><br />
-            <input type="text" id="loginName" placeholder="Username" /><br />
-            <input type="password" id="loginPassword" placeholder="Password" /><br />
-            <input type="submit" id="loginButton" className="buttons" value="Do It"
-                onClick={doLogin} />
-            <span id="loginResult"></span> */}
-            <input type="submit" id="loginButton" className="buttons" value="Login with Spotify"
-                onClick={doLogin} />
-        </div>
+        <a className="login-btn"><p>Login with Spotify</p></a>
     );
 };
 export default Login;

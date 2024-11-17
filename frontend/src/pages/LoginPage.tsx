@@ -1,29 +1,20 @@
 import React from 'react';
+import BlueSkyBackground from '../components/backgrounds/BlueSkyBackground';
+import WhiteCloudsBackground from '../components/backgrounds/WhiteCloudsBackground';
 import PageTitle from '../components/PageTitle';
+import SunBackground from '../components/backgrounds/SunBackground';
 import Login from '../components/Login';
 
-import clouds from '../images/clouds.jpg'; 
-
-const LoginPage = () => {
-    const pageStyle: React.CSSProperties = {
-        backgroundImage: `url(${clouds})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center -10px',
-        backgroundRepeat: 'no-repeat',
-        width: '100vw',
-        height: '100vh',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-    };
-
+const CanvasBackground: React.FC = () => {
     return (
-        <div style={pageStyle}>
-            <PageTitle />
-            <Login />
-        </div>
+        <>
+            <BlueSkyBackground />
+            <SunBackground />
+            <WhiteCloudsBackground />
+            <PageTitle/>
+            <Login/>
+        </>
     );
 };
 
-export default LoginPage;
+export default CanvasBackground;
