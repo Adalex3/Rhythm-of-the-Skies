@@ -8,7 +8,7 @@ function Login() {
         alert('doIt()');
     }
     return (
-        <a className="login-btn"><p>Login with Spotify</p></a>
+        <a className="login-btn" href="#" onClick={doLogin}><p>Login with Spotify</p></a>
     );
 };
 export default Login;
