@@ -1,6 +1,16 @@
 import React, { useEffect } from 'react';
 
-const WhiteCloudsBackground: React.FC = () => {
+interface WhiteCloudsBackgroundProps {
+    cloudCount: number;
+    cloudSpeed: number;
+    cloudSize: number;
+}
+
+const WhiteCloudsBackground: React.FC<WhiteCloudsBackgroundProps> = ({
+    cloudCount,
+    cloudSpeed,
+    cloudSize,
+}) => {
     useEffect(() => {
         const container = document.createElement('div');
         container.style.position = 'absolute';
@@ -20,7 +30,6 @@ const WhiteCloudsBackground: React.FC = () => {
         const canvasWidth = document.body.getBoundingClientRect().width/5;
         const canvasHeight = document.body.getBoundingClientRect().height/5;
         const pixelationFactor = 3;
-        const cloudCount = 100;
         const clouds: { x: number; y: number, stretch: number, baseRadius: number, amplitude:number, lobes: number, asymmetryFactor: number, random1: number, random2: number, speed: number }[] = [];
 
         canvas.width = canvasWidth;
@@ -32,13 +41,13 @@ const WhiteCloudsBackground: React.FC = () => {
                 x: Math.random() * canvasWidth * 2,
                 y: Math.random() * canvasHeight,
                 stretch: Math.sqrt((Math.random()*2))+0.05,
-                baseRadius: Math.random()*20+4,
+                baseRadius: Math.random()*20*cloudSize+4,
                 amplitude: Math.random()*2+1,
                 lobes: Math.random()*2+4,
                 asymmetryFactor: 1,
                 random1: Math.random(),
                 random2: Math.random(),
-                speed: i*0.001+0.01
+                speed: i*0.001*cloudSpeed+0.01
             });
         }
 

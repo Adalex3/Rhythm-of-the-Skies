@@ -10,7 +10,10 @@ const LoginPage: React.FC = () => {
         <>
             <BlueSkyBackground />
             <SunBackground />
-            <WhiteCloudsBackground />
+            <WhiteCloudsBackground 
+                        cloudCount={100}
+                        cloudSpeed={0.5}
+                        cloudSize={2}/>
             <PageTitle/>
             <Login/>
         </>

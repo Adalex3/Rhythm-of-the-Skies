@@ -8,7 +8,10 @@ const PreferencesPage: React.FC = () => {
         <>
             <BlueSkyBackground />
             <SunBackground />
-            <WhiteCloudsBackground />
+            <WhiteCloudsBackground 
+                        cloudCount={10}
+                        cloudSpeed={1}
+                        cloudSize={1}/>
         </>
     );
 };
