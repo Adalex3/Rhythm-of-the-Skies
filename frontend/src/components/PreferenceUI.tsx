@@ -93,6 +93,7 @@ const PreferenceUI: React.FC = () => {
 
     return (
         <>
+        <h1>Muscial Preference</h1>
         <form onSubmit={onSubmit}>
          {/* Sunny day preference */}
          <div className='container' onBlur={handleBlur}>
