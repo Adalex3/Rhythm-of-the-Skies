@@ -50,6 +50,17 @@ h1 {
   font-style: normal;
 }
 
+h2 {
+  font-size: 2.5em;
+  font-family: "VT323", monospace;
+  line-height: 1.1;
+}
+h3 {
+  font-size: 1.6em;
+  font-family: "VT323", monospace;
+  
+}
+
 #title {
   background-color: #253C78;
   padding: 2% 5%;
@@ -88,4 +99,82 @@ h1 {
   transition: 0.05s ease-in-out;
   font-size: 1.9rem;
   scale: 95%;
+}
+
+.container {
+  display: flex;
+  flex-shrink: 0;
+}
+.pref-icon {
+  display:inline-block;
+  width: 75%;
+  margin:15px 20px 10px 0px;
+  border: solid 4px #fff;
+}
+
+
+.pref-gen-search{
+    font-family: "VT323", monospace;
+    font-size: 2rem;
+    width: 50%;
+    padding: 10px;
+    margin-Bottom: 10px;
+    border: 1px solid #ccc;
+    border-Radius: 4px;
+
+}
+
+.pref-gen-check{ 
+  font-family: "VT323", monospace;
+  max-Height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-Radius: 4px;
+  display: grid;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 0;
+  margin-right:0;
+  font-Size: 1.5rem
+}
+
+.pref-gen-sel{
+  margin-top: "20px" ;
+  font-family: "VT323", monospace;
+  font-size: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  gap: 10px;
+  display: flex;
+  flex-Wrap: wrap;
+}
+
+.pref-gen-sel2{
+  padding: 5px 10px;
+  background-Color: #4B6AFC;
+  color: white;
+  border-Radius: 5px;
+  display: flex;
+  align-Items: center;
+  gap: 5px;
+}
+
+.pref-x-btn{
+  margin-Left: 8px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-Weight: bold;
+}
+
+figure img {
+  vertical-align: top;
+}
+
+.pref-submit-btn{
+  font-family: "VT323", monospace;
+  font-size: 1.9rem;
+  cursor: pointer;
 }
