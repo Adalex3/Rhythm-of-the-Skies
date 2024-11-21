@@ -101,6 +101,11 @@ h3 {
   scale: 95%;
 }
 
+.loggedin-user {
+  font-family: "VT323", monospace;
+  float: right;
+  font-size: 1.3em;
+}
 .container {
   display: flex;
   flex-shrink: 0;
@@ -177,4 +182,11 @@ figure img {
   font-family: "VT323", monospace;
   font-size: 1.9rem;
   cursor: pointer;
+}
+
+.buttons{
+  font-family: "VT323", monospace;
+  font-size: 1.5rem;
+  cursor: pointer;
+
 }
