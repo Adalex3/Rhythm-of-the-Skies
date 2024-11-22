@@ -3,6 +3,7 @@ import sunny from '../images/Sunny.png'
 import cloudy from '../images/Cloudy.png'
 import rainy from '../images/rainy.png'
 import snowy from '../images/Snowy.png'
+import moon from '../images/moon.png'
 import preferences_rainbow from '../images/preferences_rainbow.png'
 
 
@@ -37,18 +38,23 @@ const PreferenceUI: React.FC = () => {
     const [cloudySearchTerm, setCloudySearchTerm] = useState("");
     const [rainySearchTerm, setRainySearchTerm] = useState("");
     const [snowySearchTerm, setSnowySearchTerm] = useState("");
+    const [nightSearchTerm, setNightSearchTerm] = useState("");
+
 
     // Stores genre that user selected into what is initially an empty array(s)
     const [sunnySelectedGenres, setSunnySelectedGenres] = useState<string[]>([]);
     const [cloudySelectedGenres, setCloudySelectedGenres] = useState<string[]>([]);
     const [rainySelectedGenres, setRainySelectedGenres] = useState<string[]>([]);
     const [snowySelectedGenres, setSnowySelectedGenres] = useState<string[]>([]);
+    const [nightSelectedGenres, setNightSelectedGenres] = useState<string[]>([]);
+
 
     // Track visibility of genres
     const [sunnyActive, setSunnyActive] = useState(false);
     const [cloudyActive, setCloudyActive] = useState(false);
     const [rainyActive, setRainyActive] = useState(false);
     const [snowyActive, setSnowyActive] = useState(false);
+    const [nightActive, setNightActive] = useState(false);
 
     // The behavior of the checkbox list
     const handleCheckboxChange = (
@@ -90,6 +96,7 @@ const PreferenceUI: React.FC = () => {
             setCloudyActive(false);
             setRainyActive(false);
             setSnowyActive(false);
+            setNightActive(false);
         }
     };
 
@@ -105,19 +112,23 @@ const PreferenceUI: React.FC = () => {
 
             <div className="header">
                 <header id="pref_title">Rhythm of the Skies</header> 
-                <h1>Musical Preferences</h1>
+            </div>
+            <div className='location'>
+                <h2>Enter Location: </h2>
 
             </div>
-            {/* <h1>Musical Preferences</h1> */}
+
+            <h1>Musical Preferences</h1>
+            
             <div className="outline">
                 <form onSubmit={onSubmit}>                       
                     {/* Sunny day preference */}
                     
                     <div className='container' onBlur={handleBlur}>
                         <div >
-                            <img style={{ width: "70%" }} src={sunny} />
+                            <img style={{ width: "60%" }} src={sunny} />
                             <div>
-                                <h2 ><strong>Sunny</strong></h2>
+                                <h2><strong>Sunny</strong></h2>
                             </div>
                         </div>
                         <div style={{ width: "200%" }}>
@@ -177,11 +188,79 @@ const PreferenceUI: React.FC = () => {
                         </div>
                     </div>
 
+                    <hr className="centered-hr" />
+
+                    {/* Night preference */}
                     
+                    <div className='container' onBlur={handleBlur}>
+                        <div >
+                            <img style={{ width: "60%" }} src={sunny} />
+                            <div>
+                                <h2><strong>Night</strong></h2>
+                            </div>
+                        </div>
+                        <div style={{ width: "200%" }}>
+                            <h3>I want to hear...</h3>
+                            {/* Search Bar */}
+                            <input className="pref-gen-search"
+                                type="text"
+                                placeholder="Search genres..."
+                                value={nightSearchTerm}
+                                onFocus={() => setNightActive(true)} // Show the list on focus
+                                onChange={(e) => setNightSearchTerm(e.target.value)}
+                            />
+
+                            {/* Genre Checkboxes */}
+                            {nightActive && (
+                                <div className="pref-gen-check">
+                                    {filteredGenres(genres, nightSearchTerm).map((genre, index) => (
+                                        <label key={index}>
+                                            <input
+                                                type="checkbox"
+                                                value={genre}
+                                                checked={nightSelectedGenres.includes(genre)}
+                                                onChange={() =>
+                                                    handleCheckboxChange(
+                                                        genre,
+                                                        nightSelectedGenres,
+                                                        setNightSelectedGenres
+                                                    )
+                                                }
+                                            />
+                                            {genre}
+                                        </label>
+                                    ))}
+                                </div>
+                            )}
+                            {/* Selected Genres */}
+                            <div className="pref-gen-sel">
+                                {nightSelectedGenres.map((genre, index) => (
+                                    <div key={index} className="pref-gen-sel2">
+                                        {genre}
+                                        {/* x button removes the genre when clicked */}
+                                        <button
+                                            className='pref-x-btn'
+                                            onClick={() =>
+                                                handleRemoveGenre(
+                                                    genre,
+                                                    nightSelectedGenres,
+                                                    setNightSelectedGenres
+                                                )
+                                            }
+                                        >
+                                            x
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr className="centered-hr" />
                     {/* Cloudy day preference */}
                     <div className='container' onBlur={handleBlur}>
                         <div >
-                            <img style={{ width: "70%" }} src={cloudy} />
+                            <img style={{ width: "60%" }} src={cloudy} />
                             <div>
                                 <h2 ><strong>Cloudy</strong></h2>
                             </div>
@@ -243,13 +322,12 @@ const PreferenceUI: React.FC = () => {
                         </div>
                     </div>
 
-
-
+                    <hr className="centered-hr" />
 
                     {/* Rainy day preference */}
                     <div className='container' onBlur={handleBlur}>
                         <div >
-                            <img style={{ width: "70%" }} src={rainy} />
+                            <img style={{ width: "60%" }} src={rainy} />
                             <div>
                                 <h2 ><strong>Rainy</strong></h2>
                             </div>
@@ -311,11 +389,12 @@ const PreferenceUI: React.FC = () => {
                         </div>
                     </div>
 
+                    <hr className="centered-hr" />
 
                     {/* Snowy day preference */}
                     <div className='container' onBlur={handleBlur}>
                         <div >
-                            <img style={{ width: "70%" }} src={snowy} />
+                            <img style={{ width: "60%" }} src={snowy} />
                             <div>
                                 <h2 ><strong>Snowy</strong></h2>
                             </div>
