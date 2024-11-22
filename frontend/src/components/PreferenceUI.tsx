@@ -3,7 +3,7 @@ import sunny from '../images/Sunny.png'
 import cloudy from '../images/Cloudy.png'
 import rainy from '../images/rainy.png'
 import snowy from '../images/Snowy.png'
-// import night from './images/night.png'
+import preferences_rainbow from '../images/preferences_rainbow.png'
 
 
 const genres = [
@@ -101,293 +101,283 @@ const PreferenceUI: React.FC = () => {
 
     return (
         <>
-            <div
-            // style={{ 
-            //     backgroundColor: '#cee7f2',
-            //     backgroundSize: 'contain',
-            //     position: 'absolute',
-            //     top: 0,
-            //     left: 0,
-            //     width: '100%',
-            //     height: '100%',
-            //     zIndex: -1 
-            //   }} 
-            >
+            <div className="background"></div>
 
-                <h1>Muscial Preference</h1>
-                <div style={{ position: 'relative', zIndex: 1 }}>
-                    <form onSubmit={onSubmit}>                       
-                        {/* Sunny day preference */}
-                        
-                        <div className='container' onBlur={handleBlur}>
-                            <div >
-                                <img style={{ width: "70%" }} src={sunny} />
-                                <div>
-                                    <h2 ><strong>Sunny</strong></h2>
-                                </div>
+            <div className="header">
+                <header id="pref_title">Rhythm of the Skies</header> 
+                <h1>Musical Preferences</h1>
+
+            </div>
+            {/* <h1>Musical Preferences</h1> */}
+            <div className="outline">
+                <form onSubmit={onSubmit}>                       
+                    {/* Sunny day preference */}
+                    
+                    <div className='container' onBlur={handleBlur}>
+                        <div >
+                            <img style={{ width: "70%" }} src={sunny} />
+                            <div>
+                                <h2 ><strong>Sunny</strong></h2>
                             </div>
-                            <div style={{ width: "200%" }}>
-                                <h3>I want to hear...</h3>
-                                {/* Search Bar */}
-                                <input className="pref-gen-search"
-                                    type="text"
-                                    placeholder="Search genres..."
-                                    value={sunnySearchTerm}
-                                    onFocus={() => setSunnyActive(true)} // Show the list on focus
-                                    onChange={(e) => setSunnySearchTerm(e.target.value)}
-                                />
+                        </div>
+                        <div style={{ width: "200%" }}>
+                            <h3>I want to hear...</h3>
+                            {/* Search Bar */}
+                            <input className="pref-gen-search"
+                                type="text"
+                                placeholder="Search genres..."
+                                value={sunnySearchTerm}
+                                onFocus={() => setSunnyActive(true)} // Show the list on focus
+                                onChange={(e) => setSunnySearchTerm(e.target.value)}
+                            />
 
-                                {/* Genre Checkboxes */}
-                                {sunnyActive && (
-                                    <div className="pref-gen-check">
-                                        {filteredGenres(genres, sunnySearchTerm).map((genre, index) => (
-                                            <label key={index}>
-                                                <input
-                                                    type="checkbox"
-                                                    value={genre}
-                                                    checked={sunnySelectedGenres.includes(genre)}
-                                                    onChange={() =>
-                                                        handleCheckboxChange(
-                                                            genre,
-                                                            sunnySelectedGenres,
-                                                            setSunnySelectedGenres
-                                                        )
-                                                    }
-                                                />
-                                                {genre}
-                                            </label>
-                                        ))}
-                                    </div>
-                                )}
-                                {/* Selected Genres */}
-                                <div className="pref-gen-sel">
-                                    {sunnySelectedGenres.map((genre, index) => (
-                                        <div key={index} className="pref-gen-sel2">
-                                            {genre}
-                                            {/* x button removes the genre when clicked */}
-                                            <button
-                                                className='pref-x-btn'
-                                                onClick={() =>
-                                                    handleRemoveGenre(
+                            {/* Genre Checkboxes */}
+                            {sunnyActive && (
+                                <div className="pref-gen-check">
+                                    {filteredGenres(genres, sunnySearchTerm).map((genre, index) => (
+                                        <label key={index}>
+                                            <input
+                                                type="checkbox"
+                                                value={genre}
+                                                checked={sunnySelectedGenres.includes(genre)}
+                                                onChange={() =>
+                                                    handleCheckboxChange(
                                                         genre,
                                                         sunnySelectedGenres,
                                                         setSunnySelectedGenres
                                                     )
                                                 }
-                                            >
-                                                x
-                                            </button>
-                                        </div>
+                                            />
+                                            {genre}
+                                        </label>
                                     ))}
                                 </div>
+                            )}
+                            {/* Selected Genres */}
+                            <div className="pref-gen-sel">
+                                {sunnySelectedGenres.map((genre, index) => (
+                                    <div key={index} className="pref-gen-sel2">
+                                        {genre}
+                                        {/* x button removes the genre when clicked */}
+                                        <button
+                                            className='pref-x-btn'
+                                            onClick={() =>
+                                                handleRemoveGenre(
+                                                    genre,
+                                                    sunnySelectedGenres,
+                                                    setSunnySelectedGenres
+                                                )
+                                            }
+                                        >
+                                            x
+                                        </button>
+                                    </div>
+                                ))}
                             </div>
                         </div>
+                    </div>
 
-
-                        
-                        {/* Cloudy day preference */}
-                        <div className='container' onBlur={handleBlur}>
-                            <div >
-                                <img style={{ width: "70%" }} src={cloudy} />
-                                <div>
-                                    <h2 ><strong>Cloudy</strong></h2>
-                                </div>
+                    
+                    {/* Cloudy day preference */}
+                    <div className='container' onBlur={handleBlur}>
+                        <div >
+                            <img style={{ width: "70%" }} src={cloudy} />
+                            <div>
+                                <h2 ><strong>Cloudy</strong></h2>
                             </div>
-                            <div style={{ width: "200%" }}>
-                                <h3>I want to hear...</h3>
-                                {/* Search Bar */}
-                                <input className="pref-gen-search"
-                                    type="text"
-                                    placeholder="Search genres..."
-                                    value={cloudySearchTerm}
-                                    onFocus={() => setCloudyActive(true)} // Show the list on focus
-                                    onChange={(e) => setCloudySearchTerm(e.target.value)}
-                                />
+                        </div>
+                        <div style={{ width: "200%" }}>
+                            <h3>I want to hear...</h3>
+                            {/* Search Bar */}
+                            <input className="pref-gen-search"
+                                type="text"
+                                placeholder="Search genres..."
+                                value={cloudySearchTerm}
+                                onFocus={() => setCloudyActive(true)} // Show the list on focus
+                                onChange={(e) => setCloudySearchTerm(e.target.value)}
+                            />
 
-                                {/* Genre Checkboxes */}
-                                {cloudyActive && (
-                                    <div className="pref-gen-check">
-                                        {filteredGenres(genres, cloudySearchTerm).map((genre, index) => (
-                                            <label key={index}>
-                                                <input
-                                                    type="checkbox"
-                                                    value={genre}
-                                                    checked={cloudySelectedGenres.includes(genre)}
-                                                    onChange={() =>
-                                                        handleCheckboxChange(
-                                                            genre,
-                                                            cloudySelectedGenres,
-                                                            setCloudySelectedGenres
-                                                        )
-                                                    }
-                                                />
-                                                {genre}
-                                            </label>
-                                        ))}
-                                    </div>
-                                )}
-                                {/* Selected Genres */}
-                                <div className="pref-gen-sel">
-                                    {cloudySelectedGenres.map((genre, index) => (
-                                        <div key={index} className="pref-gen-sel2">
-                                            {genre}
-                                            {/* x button removes the genre when clicked */}
-                                            <button
-                                                className='pref-x-btn'
-                                                onClick={() =>
-                                                    handleRemoveGenre(
+                            {/* Genre Checkboxes */}
+                            {cloudyActive && (
+                                <div className="pref-gen-check">
+                                    {filteredGenres(genres, cloudySearchTerm).map((genre, index) => (
+                                        <label key={index}>
+                                            <input
+                                                type="checkbox"
+                                                value={genre}
+                                                checked={cloudySelectedGenres.includes(genre)}
+                                                onChange={() =>
+                                                    handleCheckboxChange(
                                                         genre,
                                                         cloudySelectedGenres,
                                                         setCloudySelectedGenres
                                                     )
                                                 }
-                                            >
-                                                x
-                                            </button>
-                                        </div>
+                                            />
+                                            {genre}
+                                        </label>
                                     ))}
                                 </div>
+                            )}
+                            {/* Selected Genres */}
+                            <div className="pref-gen-sel">
+                                {cloudySelectedGenres.map((genre, index) => (
+                                    <div key={index} className="pref-gen-sel2">
+                                        {genre}
+                                        {/* x button removes the genre when clicked */}
+                                        <button
+                                            className='pref-x-btn'
+                                            onClick={() =>
+                                                handleRemoveGenre(
+                                                    genre,
+                                                    cloudySelectedGenres,
+                                                    setCloudySelectedGenres
+                                                )
+                                            }
+                                        >
+                                            x
+                                        </button>
+                                    </div>
+                                ))}
                             </div>
                         </div>
+                    </div>
 
 
 
 
-                        {/* Rainy day preference */}
-                        <div className='container' onBlur={handleBlur}>
-                            <div >
-                                <img style={{ width: "70%" }} src={rainy} />
-                                <div>
-                                    <h2 ><strong>Rainy</strong></h2>
-                                </div>
+                    {/* Rainy day preference */}
+                    <div className='container' onBlur={handleBlur}>
+                        <div >
+                            <img style={{ width: "70%" }} src={rainy} />
+                            <div>
+                                <h2 ><strong>Rainy</strong></h2>
                             </div>
-                            <div style={{ width: "200%" }}>
-                                <h3>I want to hear...</h3>
-                                {/* Search Bar */}
-                                <input className="pref-gen-search"
-                                    type="text"
-                                    placeholder="Search genres..."
-                                    value={rainySearchTerm}
-                                    onFocus={() => setRainyActive(true)} // Show the list on focus
-                                    onChange={(e) => setRainySearchTerm(e.target.value)}
-                                />
+                        </div>
+                        <div style={{ width: "200%" }}>
+                            <h3>I want to hear...</h3>
+                            {/* Search Bar */}
+                            <input className="pref-gen-search"
+                                type="text"
+                                placeholder="Search genres..."
+                                value={rainySearchTerm}
+                                onFocus={() => setRainyActive(true)} // Show the list on focus
+                                onChange={(e) => setRainySearchTerm(e.target.value)}
+                            />
 
-                                {/* Genre Checkboxes */}
-                                {rainyActive && (
-                                    <div className="pref-gen-check">
-                                        {filteredGenres(genres, rainySearchTerm).map((genre, index) => (
-                                            <label key={index}>
-                                                <input
-                                                    type="checkbox"
-                                                    value={genre}
-                                                    checked={rainySelectedGenres.includes(genre)}
-                                                    onChange={() =>
-                                                        handleCheckboxChange(
-                                                            genre,
-                                                            rainySelectedGenres,
-                                                            setRainySelectedGenres
-                                                        )
-                                                    }
-                                                />
-                                                {genre}
-                                            </label>
-                                        ))}
-                                    </div>
-                                )}
-                                {/* Selected Genres */}
-                                <div className="pref-gen-sel">
-                                    {rainySelectedGenres.map((genre, index) => (
-                                        <div key={index} className="pref-gen-sel2">
-                                            {genre}
-                                            {/* x button removes the genre when clicked */}
-                                            <button
-                                                className='pref-x-btn'
-                                                onClick={() =>
-                                                    handleRemoveGenre(
+                            {/* Genre Checkboxes */}
+                            {rainyActive && (
+                                <div className="pref-gen-check">
+                                    {filteredGenres(genres, rainySearchTerm).map((genre, index) => (
+                                        <label key={index}>
+                                            <input
+                                                type="checkbox"
+                                                value={genre}
+                                                checked={rainySelectedGenres.includes(genre)}
+                                                onChange={() =>
+                                                    handleCheckboxChange(
                                                         genre,
                                                         rainySelectedGenres,
                                                         setRainySelectedGenres
                                                     )
                                                 }
-                                            >
-                                                x
-                                            </button>
-                                        </div>
+                                            />
+                                            {genre}
+                                        </label>
                                     ))}
                                 </div>
+                            )}
+                            {/* Selected Genres */}
+                            <div className="pref-gen-sel">
+                                {rainySelectedGenres.map((genre, index) => (
+                                    <div key={index} className="pref-gen-sel2">
+                                        {genre}
+                                        {/* x button removes the genre when clicked */}
+                                        <button
+                                            className='pref-x-btn'
+                                            onClick={() =>
+                                                handleRemoveGenre(
+                                                    genre,
+                                                    rainySelectedGenres,
+                                                    setRainySelectedGenres
+                                                )
+                                            }
+                                        >
+                                            x
+                                        </button>
+                                    </div>
+                                ))}
                             </div>
                         </div>
+                    </div>
 
 
-                        {/* Snowy day preference */}
-                        <div className='container' onBlur={handleBlur}>
-                            <div >
-                                <img style={{ width: "70%" }} src={snowy} />
-                                <div>
-                                    <h2 ><strong>Snowy</strong></h2>
-                                </div>
+                    {/* Snowy day preference */}
+                    <div className='container' onBlur={handleBlur}>
+                        <div >
+                            <img style={{ width: "70%" }} src={snowy} />
+                            <div>
+                                <h2 ><strong>Snowy</strong></h2>
                             </div>
-                            <div style={{ width: "200%" }}>
-                                <h3>I want to hear...</h3>
-                                {/* Search Bar */}
-                                <input className="pref-gen-search"
-                                    type="text"
-                                    placeholder="Search genres..."
-                                    value={snowySearchTerm}
-                                    onFocus={() => setSnowyActive(true)} // Show the list on focus
-                                    onChange={(e) => setSnowySearchTerm(e.target.value)}
-                                />
+                        </div>
+                        <div style={{ width: "200%" }}>
+                            <h3>I want to hear...</h3>
+                            {/* Search Bar */}
+                            <input className="pref-gen-search"
+                                type="text"
+                                placeholder="Search genres..."
+                                value={snowySearchTerm}
+                                onFocus={() => setSnowyActive(true)} // Show the list on focus
+                                onChange={(e) => setSnowySearchTerm(e.target.value)}
+                            />
 
-                                {/* Genre Checkboxes */}
-                                {snowyActive && (
-                                    <div className="pref-gen-check">
-                                        {filteredGenres(genres, snowySearchTerm).map((genre, index) => (
-                                            <label key={index}>
-                                                <input
-                                                    type="checkbox"
-                                                    value={genre}
-                                                    checked={snowySelectedGenres.includes(genre)}
-                                                    onChange={() =>
-                                                        handleCheckboxChange(
-                                                            genre,
-                                                            snowySelectedGenres,
-                                                            setSnowySelectedGenres
-                                                        )
-                                                    }
-                                                />
-                                                {genre}
-                                            </label>
-                                        ))}
-                                    </div>
-                                )}
-                                {/* Selected Genres */}
-                                <div className="pref-gen-sel">
-                                    {/* <h3>Selected Genres:</h3> */}
-                                    {snowySelectedGenres.map((genre, index) => (
-                                        <div key={index} className="pref-gen-sel2">
-                                            {genre}
-                                            <button
-                                                className='pref-x-btn'
-                                                onClick={() =>
-                                                    handleRemoveGenre(
+                            {/* Genre Checkboxes */}
+                            {snowyActive && (
+                                <div className="pref-gen-check">
+                                    {filteredGenres(genres, snowySearchTerm).map((genre, index) => (
+                                        <label key={index}>
+                                            <input
+                                                type="checkbox"
+                                                value={genre}
+                                                checked={snowySelectedGenres.includes(genre)}
+                                                onChange={() =>
+                                                    handleCheckboxChange(
                                                         genre,
                                                         snowySelectedGenres,
                                                         setSnowySelectedGenres
                                                     )
                                                 }
-                                            >
-                                                x
-                                            </button>
-                                        </div>
+                                            />
+                                            {genre}
+                                        </label>
                                     ))}
                                 </div>
+                            )}
+                            {/* Selected Genres */}
+                            <div className="pref-gen-sel">
+                                {/* <h3>Selected Genres:</h3> */}
+                                {snowySelectedGenres.map((genre, index) => (
+                                    <div key={index} className="pref-gen-sel2">
+                                        {genre}
+                                        <button
+                                            className='pref-x-btn'
+                                            onClick={() =>
+                                                handleRemoveGenre(
+                                                    genre,
+                                                    snowySelectedGenres,
+                                                    setSnowySelectedGenres
+                                                )
+                                            }
+                                        >
+                                        </button>
+                                    </div>
+                                ))}
                             </div>
                         </div>
-
-                        <button className='pref-submit-btn' type="submit">Save</button>
-                    </form>
-                </div>
+                    </div>
+                </form>
             </div>
+            <button className='pref-submit-btn' type="submit">Save</button>
         </>
     );
 };
