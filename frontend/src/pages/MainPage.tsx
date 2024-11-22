@@ -6,13 +6,14 @@ import WhiteCloudsBackground from '../components/backgrounds/WhiteCloudsBackgrou
 import SunBackground from '../components/backgrounds/SunBackground';
 import MoonBackground from '../components/backgrounds/MoonBackground';
 import RainBackground from '../components/backgrounds/RainBackground';
+import SnowBackground from '../components/backgrounds/SnowBackground';
 import ThunderBackground from '../components/backgrounds/ThunderBackground';
 
 const MainPage: React.FC = () => {
 
     const [weather, setWeather] = useState<string | null>(null);
 
-    // Fetch weather data
+    // TODO: API WEATHER DATA (Joanne?)
     useEffect(() => {
         const fetchWeather = async () => {
             try {
@@ -55,7 +56,7 @@ const MainPage: React.FC = () => {
                         {skyBackground()}
                         <WhiteCloudsBackground 
                         cloudCount={10}
-                        cloudSpeed={1}
+                        cloudSpeed={30}
                         cloudSize={1}/>
                     </>
                 );
@@ -89,6 +90,13 @@ const MainPage: React.FC = () => {
                     <GreySkyBackground />
                     <RainBackground rainAmount={50} rainSpeed={4} rainAngle={110} />
                     <ThunderBackground variance={5000} boltLength={500} frequency={2000} boltThickness={10}/>
+                </>
+            )
+            case 'Snow':
+            return (
+                <>
+                    {skyBackground()}
+                    <SnowBackground snowAmount={1000} snowSpeed={0.4}/>
                 </>
             )
             default:
