@@ -92,10 +92,11 @@ const MainPage: React.FC = () => {
                     });
 
                     const weather_condition = weatherResponse.data.weather[0].main;
+                    const atmosphere_list = ["Mist", "Smoke", "Haze", "Dust", "Fog", "Sand", "Dust", "Ash", "Squall", "Tornado"];
 
                     if (weather_condition == 'Drizzle'){
                         weather_condition == 'Rain';
-                    } else if (weather_condition == 'Atmosphere'){
+                    } else if (atmosphere_list.includes(weather_condition)){
                         weather_condition == 'Clouds';
                     }
 
