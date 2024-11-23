@@ -18,6 +18,7 @@ function Weather()
   // const [countryCode, setCountryCode] = useState(''); 
   const [coordinates, setCoordinates] = useState<Coordinate[]>([]);
   const [weather, setWeather] = useState('');
+  const [temperature, setTemperature] = useState('');
   const [error, setError] = useState(''); 
 
   
@@ -45,9 +46,11 @@ function Weather()
             lon:lon,
           },
         });
-        console.log(weatherResponse);
-        console.log(weatherResponse.data.weather[0].main);
+        // console.log(weatherResponse);
+        // console.log(weatherResponse.data.weather[0].main);
+        // console.log(weatherResponse.data.main.temp)
         setWeather(weatherResponse.data.weather[0].main);
+        setTemperature(weatherResponse.data.main.temp);
       } else {
         setError('No coordinates found');
       }
@@ -96,6 +99,7 @@ function Weather()
             <p>Latitude: {coordinates[0].lat}</p>
             <p>Longitude: {coordinates[0].lon}</p>
             <p>Weather: {weather}</p>
+            <p>Temperature: {temperature}</p>
           </div>
         )}
 
