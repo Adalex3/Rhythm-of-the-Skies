@@ -8,16 +8,59 @@ import MoonBackground from '../components/backgrounds/MoonBackground';
 import RainBackground from '../components/backgrounds/RainBackground';
 import SnowBackground from '../components/backgrounds/SnowBackground';
 import ThunderBackground from '../components/backgrounds/ThunderBackground';
+import OverviewPanel from '../components/OverviewPanel';
+import PlaylistDisplay from '../components/PlaylistDisplay';
+import ProfileDisplay from '../components/ProfileDisplay';
+
+// TEMP
+import { playlist1, playlist2, playlist3 } from "../sample_data";
+
+
+interface Weather {
+    temp: number;
+    condition: string;
+    location: string;
+  }
+  
+interface Song {
+    id: string;
+    track_id: string;
+    track_name: string;
+    artist_name: string;
+    artist_id: string;
+    album_name: string;
+    album_id: string;
+    album_image_url: string;
+    track_url: string;
+    duration: number;
+}
+
+interface Playlist {
+    id: string;
+    user_id: string;
+    genres: String[];
+    weatherConditions: String[];
+    songs: Song[];
+    date: Date;
+}
 
 const MainPage: React.FC = () => {
 
-    const [weather, setWeather] = useState<string | null>(null);
+    const [weather, setWeather] = useState<Weather | null>(null);
+    const [playlist, setPlaylist] = useState<Playlist | null>(null);
 
-    // TODO: API WEATHER DATA (Joanne?)
     useEffect(() => {
+        const fetchPlaylist = async (weather: Weather) => {
+            // TODO: GET PLAYLIST FROM API
+            const api_playlist = playlist1; // SAMPLE DATA
+            setPlaylist(api_playlist);
+        }
         const fetchWeather = async () => {
             try {
-                setWeather("Clear");
+                // TODO: GET WEATHER FROM API
+                const api_weather = {condition: "Clear", location: "Orlanfdsfdo", temp: 70.0};
+                setWeather(api_weather);
+                fetchPlaylist(api_weather);
             } catch (error) {
                 console.error('Error fetching weather data:', error);
             }
@@ -29,7 +72,7 @@ const MainPage: React.FC = () => {
 
     // Render sky based on time
     const skyBackground = () => {
-        const isDaytime = new Date().getHours() >= 7 && new Date().getHours() < 19;
+        const isDaytime = new Date().getHours() >= 7 && new Date().getHours() < 18;
         if(isDaytime) {
             return (
                 <>
@@ -49,7 +92,7 @@ const MainPage: React.FC = () => {
 
     // Render background based on weather
     const renderBackground = () => {
-        switch (weather) {
+        switch (weather?.condition) {
             case 'Clear':
                 return (
                     <>
@@ -105,10 +148,23 @@ const MainPage: React.FC = () => {
     };
 
     return (
-        <div>
-            {weather ? renderBackground() : <p>Loading weather data...</p>}
+        <div className="app">
+          {renderBackground()}
+          <div className="content">
+            {weather ? (
+              <OverviewPanel weather={weather} />
+            ) : (
+              <p>Loading weather data...</p>
+            )}
+            {playlist ? (
+              <PlaylistDisplay playlist={playlist} />
+            ) : (
+              <p>Loading playlist...</p>
+            )}
+            <ProfileDisplay username="Alex Hynds" />
+          </div>
         </div>
-    );
+      );
 
 };
 

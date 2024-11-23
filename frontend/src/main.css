@@ -1,0 +1,73 @@
+p {
+    font-family: "VT323", monospace;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.top-content {
+    /* width: 100vw; */
+    display:flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 5vw;
+}
+
+.image-side img {
+    width: 30vw;
+    height: 30vh;
+    object-fit: contain;
+}
+
+.songs-side {
+    width: 50vw;
+}
+
+.vibe-title {
+    text-align: left;
+    color: white;
+    margin: 0 0 -1.25rem 0;
+}
+
+.vibe {
+    font-size: 3rem;
+    text-align: left;
+}
+
+.song-list {
+    width: 50vw;
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    align-items: start;
+    max-height: 30vh;
+    overflow: scroll;
+}
+
+.song-list .song {
+    display: flex;
+    flex-direction: row;
+    /* justify-content: center; */
+    /* align-items: ; */
+    justify-content: space-between;
+    width: 100%;
+}
+
+.song-list .song .title-artist {
+    display:flex;
+    flex-direction: column;
+    align-items: start;
+}
+
+.song-list .song .title {
+    font-size: 1.4rem;
+}
+
+.song-list .song .artist {
+    font-size: 1.1rem;
+}
+
+.song-list .song p {
+    margin: 0;
+}
