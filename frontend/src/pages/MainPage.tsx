@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import BlueSkyBackground from '../components/backgrounds/BlueSkyBackground';
 import GreySkyBackground from '../components/backgrounds/GreySkyBackground';
 import NightSkyBackground from '../components/backgrounds/NightSkyBackground';
@@ -44,10 +45,21 @@ interface Playlist {
     date: Date;
 }
 
+// interface Coordinate {
+//     name: string;
+//     local_names: Record<string, string>;
+//     lat: number;
+//     lon: number;
+//     country: string;
+// }
+
 const MainPage: React.FC = () => {
 
     const [weather, setWeather] = useState<Weather | null>(null);
     const [playlist, setPlaylist] = useState<Playlist | null>(null);
+    const [cityName, setCityName] = useState(''); 
+    const [stateName, setStateName] = useState(''); 
+    // const [coordinates, setCoordinates] = useState<Coordinate[]>([]);
 
     useEffect(() => {
         const fetchPlaylist = async (weather: Weather) => {
@@ -58,13 +70,63 @@ const MainPage: React.FC = () => {
         const fetchWeather = async () => {
             try {
                 // TODO: GET WEATHER FROM API
-                const api_weather = {condition: "Clear", location: "Orlanfdsfdo", temp: 70.0};
-                setWeather(api_weather);
-                fetchPlaylist(api_weather);
+                const response = await axios.get('http://localhost:5000/api/coord', {
+                    params : {
+                        cityName:cityName,
+                        stateName:stateName,
+                        limit:1,
+                    },
+                });
+        
+                const coordinates = response.data; // Assuming coordinates is first item
+        
+        
+                if (coordinates.length > 0) {
+                    const { lat, lon } = coordinates[0];
+            
+                    const weatherResponse = await axios.get('http://localhost:5000/api/weather', {
+                        params : {
+                        lat:lat,
+                        lon:lon,
+                        },
+                    });
+
+                    const weather_condition = weatherResponse.data.weather[0].main;
+
+                    if (weather_condition == 'Drizzle'){
+                        weather_condition == 'Rain';
+                    } else if (weather_condition == 'Atmosphere'){
+                        weather_condition == 'Clouds';
+                    }
+
+                    const api_weather = {condition: weather_condition, location: cityName, temp: weatherResponse.data.main.temp};
+                    setWeather(api_weather);
+                    fetchPlaylist(api_weather);
+                }
+                else {
+                    console.error('Coordinates not found!');
+                }
+        
+                // setCoordinates(coordinates);
+
+                
+                // const api_weather = {condition: "Clear", location: "Orlanfdsfdo", temp: 70.0};
+                // setWeather(api_weather);
+                // fetchPlaylist(api_weather);
             } catch (error) {
                 console.error('Error fetching weather data:', error);
             }
         };
+
+        function handleSetCityName(e : any) : void
+        {
+            setCityName(e.target.value);
+        }
+
+        function handleSetStateName(e : any) : void
+        {
+            setStateName(e.target.value);
+        }
 
         fetchWeather();
     }, []);
@@ -103,7 +165,7 @@ const MainPage: React.FC = () => {
                         cloudSize={1}/>
                     </>
                 );
-            case 'Cloudy':
+            case 'Clouds':
                 return (
                     <>
                         {skyBackground()}
