@@ -153,6 +153,7 @@ const MainPage: React.FC = () => {
                 </>
             )
         } else {
+            document.body.classList.toggle("white-text",true);
             return (
                 <>
                     <NightSkyBackground />
