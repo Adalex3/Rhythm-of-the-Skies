@@ -64,13 +64,13 @@ const MainPage: React.FC = () => {
 
     useEffect(() => {
         const fetchPlaylist = async (weather: Weather) => {
-            // TODO: GET PLAYLIST FROM API
-            const api_playlist = playlist1; // SAMPLE DATA
+            // TODO: CORA & JOANNE ADD PLAYLIST API
+            const api_playlist = playlist1; // SAMPLE DATA, remove later
             setPlaylist(api_playlist);
         }
         const fetchWeather = async () => {
             try {
-                // TODO: GET WEATHER FROM API
+                // TODO: GET WEATHER FROM API (JOANNE)
 
 
                 const api_weather = {condition: "Clear", location: "Orlando", temp: 54.0};
