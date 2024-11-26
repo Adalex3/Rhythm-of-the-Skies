@@ -21,6 +21,7 @@ interface Playlist {
     weatherConditions: String[];
     songs: Song[];
     date: Date;
+    spotify_url: string;
 }
 
 interface PlaylistDisplayProps {
@@ -42,6 +43,12 @@ const PlaylistDisplay: React.FC<PlaylistDisplayProps> = ({ playlist }) => {
         }
     };
 
+    const formatDuration = (seconds: number): string => {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+    };
+
   return (
     <div className="playlist-display">
         <div className="top-content">
@@ -58,15 +65,20 @@ const PlaylistDisplay: React.FC<PlaylistDisplayProps> = ({ playlist }) => {
                         <p className="title">{song.track_name}</p>
                         <p className="artist">{song.artist_name}</p>
                         </div>
-                        <p className="duration">{song.duration}</p>
+                        <p className="duration">{formatDuration(song.duration)}</p>
                     </div>
                     ))}
                 </div>
             </div>
         </div>
         <div className="bottom-content">
-            <button className="spotify-button">Play on Spotify</button>
-            <button className="preferences-button">Edit preferences</button>
+            <button className="spotify-button" onClick={() => {
+                window.location.href = playlist.spotify_url;
+            }}
+            >Play on Spotify</button>
+            <button className="preferences-button" onClick={() => {
+                window.location.href = "/preferences";
+            }}>Edit preferences</button>
         </div>
     </div>
   );

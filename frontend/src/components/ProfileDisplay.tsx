@@ -8,8 +8,11 @@ interface ProfileDisplayProps {
 const ProfileDisplay: React.FC<ProfileDisplayProps> = ({ username }) => {
   return (
     <div className="profile-display">
-      <p>{username}</p>
-      <button>Sign out</button>
+      <img src="../src/assets/person.png"></img>
+      <div className="">
+        <p>{username}</p>
+        <button>Sign out</button>
+      </div>
     </div>
   );
 };

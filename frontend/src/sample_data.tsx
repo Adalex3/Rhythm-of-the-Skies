@@ -20,6 +20,7 @@ export interface Playlist {
     weatherConditions: String[];
     songs: Song[];
     date: Date;
+    spotify_url: string;
 }
 
 export const song1: Song = {
@@ -67,7 +68,8 @@ export const playlist1: Playlist = {
     genres: ["Lofi", "Chill"],
     weatherConditions: ["Rainy"],
     songs: [song1, song3, song2, song1, song1, song1, song1, song1, song1],
-    date: new Date("2024-11-22")
+    date: new Date("2024-11-22"),
+    spotify_url: "https://open.spotify.com/"
 };
 
 export const playlist2: Playlist = {
@@ -76,7 +78,8 @@ export const playlist2: Playlist = {
     genres: ["Pop", "Dance"],
     weatherConditions: ["Sunny"],
     songs: [song2],
-    date: new Date("2024-11-22")
+    date: new Date("2024-11-22"),
+    spotify_url: "https://open.spotify.com/"
 };
 
 export const playlist3: Playlist = {
@@ -85,5 +88,6 @@ export const playlist3: Playlist = {
     genres: ["Ambient"],
     weatherConditions: ["Cloudy"],
     songs: [song3],
-    date: new Date("2024-11-22")
+    date: new Date("2024-11-22"),
+    spotify_url: "https://open.spotify.com/"
 };

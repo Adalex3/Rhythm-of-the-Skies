@@ -43,6 +43,7 @@ interface Playlist {
     weatherConditions: String[];
     songs: Song[];
     date: Date;
+    spotify_url: string;
 }
 
 // interface Coordinate {
@@ -70,6 +71,13 @@ const MainPage: React.FC = () => {
         const fetchWeather = async () => {
             try {
                 // TODO: GET WEATHER FROM API
+
+
+                const api_weather = {condition: "Clear", location: "Orlando", temp: 54.0};
+                    setWeather(api_weather);
+                    fetchPlaylist(api_weather);
+                return
+
                 const response = await axios.get('http://localhost:5000/api/coord', {
                     params : {
                         cityName:cityName,
@@ -79,6 +87,7 @@ const MainPage: React.FC = () => {
                 });
         
                 const coordinates = response.data; // Assuming coordinates is first item
+                console.log(response);
         
         
                 if (coordinates.length > 0) {

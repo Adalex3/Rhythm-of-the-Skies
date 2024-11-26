@@ -11,6 +11,8 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* overflow: hidden; */
 }
 
 a {
@@ -20,6 +22,32 @@ a {
 }
 a:hover {
   color: #535bf2;
+}
+
+button {
+  background-color: white;
+  color: black;
+  padding: 0.5% 1%;
+  /* border-radius: 10px; */
+  margin: 1%;
+  border: solid 1px transparent;
+  border-bottom: 2px black solid;
+  border-right: 2px black solid;
+  cursor: pointer;
+  transition: scale 0.2s;
+  font-family: 'VT323';
+  font-size: 1.3rem;
+}
+button:hover {
+  background-color: black;
+  color: white;
+  border-bottom: 2px white solid;
+  border-right: 2px white solid;
+  scale: 105%;
+}
+
+button:active {
+  scale: 97%;
 }
 
 body {
@@ -289,4 +317,79 @@ figure img {
   width: 100%;
   height: 100%;
   z-index: -1; 
+}
+
+
+.profile-display {
+  position: fixed;
+  top: 5%;
+  right: 5%;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  background-color: rgba(255,255,255,0.5);
+  padding: 1%;
+}
+
+.profile-display div {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.profile-display img {
+  width: 40px;
+  transform: translate(-1%, -5%) scale(125%);
+}
+
+.profile-display p {
+  color: black;
+  font-size: 1.5rem;
+  margin: -5%;
+}
+
+
+.playlist-display {
+  /* background-color: rgba(255,255,255,0.2); */
+}
+
+.overview-panel h2 {
+  color: #2D2A3A;
+  font-size: 4rem;
+  margin: 0;
+}
+.overview-panel p {
+  color: #2D2A3A;
+  font-size: 2rem;
+}
+
+.overview-panel {
+  margin: 0 0 5% 0;
+}
+
+.temp-line {
+  border-top: solid 2px #242424;
+  max-width: 300px;
+  margin: auto;
+}
+
+.image-side {
+  /* background-color: rgba(255,255,255,0.05); */
+  filter: drop-shadow(0px 0px 5px rgba(0,0,0,0.4));
+}
+
+.song-list {
+  /* background-color: rgba(255,255,255,0.05); */
+  box-shadow: inset 0px 0px 10px rgba(0,0,0,0.2);
+  padding: 2%;
+}
+
+
+.playlist-display p, .playlist-display h3 {
+  color: black;
+  /* filter: drop-shadow(1px 1px 0px white); */
+  color: #2D2A3A !important;
 }
