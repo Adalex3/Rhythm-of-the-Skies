@@ -166,6 +166,7 @@ const MainPage: React.FC = () => {
     const renderBackground = () => {
         switch (weather?.condition) {
             case 'Clear':
+                document.body.classList.toggle("white-text",false);
                 return (
                     <>
                         {skyBackground()}
@@ -176,6 +177,7 @@ const MainPage: React.FC = () => {
                     </>
                 );
             case 'Clouds':
+                document.body.classList.toggle("white-text",false);
                 return (
                     <>
                         {skyBackground()}
@@ -186,6 +188,7 @@ const MainPage: React.FC = () => {
                     </>
                 );
             case 'Rain':
+                document.body.classList.toggle("white-text",true);
                 return (
                     <>
                         <GreySkyBackground />
@@ -193,6 +196,7 @@ const MainPage: React.FC = () => {
                     </>
                 );
             case 'Storm':
+                document.body.classList.toggle("white-text",true);
                 return (
                     <>
                         <GreySkyBackground />
@@ -200,20 +204,22 @@ const MainPage: React.FC = () => {
                     </>
                 )
             case 'Thunderstorm':
-            return (
-                <>
-                    <GreySkyBackground />
-                    <RainBackground rainAmount={50} rainSpeed={4} rainAngle={110} />
-                    <ThunderBackground variance={5000} boltLength={500} frequency={2000} boltThickness={10}/>
-                </>
-            )
+                document.body.classList.toggle("white-text",true);
+                return (
+                    <>
+                        <GreySkyBackground />
+                        <RainBackground rainAmount={50} rainSpeed={4} rainAngle={110} />
+                        <ThunderBackground variance={5000} boltLength={500} frequency={2000} boltThickness={10}/>
+                    </>
+                )
             case 'Snow':
-            return (
-                <>
-                    {skyBackground()}
-                    <SnowBackground snowAmount={1000} snowSpeed={0.4}/>
-                </>
-            )
+                document.body.classList.toggle("white-text",false);
+                return (
+                    <>
+                        {skyBackground()}
+                        <SnowBackground snowAmount={1000} snowSpeed={0.4}/>
+                    </>
+                )
             default:
                 return <>{skyBackground()}</>; // Fallback
         }

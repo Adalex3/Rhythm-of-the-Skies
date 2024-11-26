@@ -366,6 +366,15 @@ figure img {
   font-size: 2rem;
 }
 
+
+.white-text .overview-panel h2 {
+  text-shadow: 1px 1px 0px black, -1px -1px 0px black;
+}
+
+.white-text .overview-panel p {
+  text-shadow: 0.5px 0.5px 0px black, -0.5px -0.5px 0px black;
+}
+
 .overview-panel {
   margin: 0 0 5% 0;
 }
@@ -389,7 +398,36 @@ figure img {
 
 
 .playlist-display p, .playlist-display h3 {
-  color: black;
   /* filter: drop-shadow(1px 1px 0px white); */
-  color: #2D2A3A !important;
+  color: #2D2A3A;
+}
+
+
+.white-text .playlist-display p, .white-text .playlist-display h3, .white-text p, .white-text h2 {
+  color: white;
+}
+
+.profile-display {
+  background-color: transparent;
+}
+.white-text .profile-display img {
+  filter: invert(100%);
+}
+
+
+.spotify-button {
+  background-color: #D79544
+}
+
+.white-text .vibe, .white-text .vibe-title {
+  text-shadow: 1px 1px 0px black, -1px -1px 0px black;
+}
+
+button:hover .gear {
+  filter: invert(100%);
+}
+
+.gear {
+  width: 12px;
+  transform: scale(160%);
 }

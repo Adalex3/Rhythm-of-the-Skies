@@ -78,7 +78,7 @@ const PlaylistDisplay: React.FC<PlaylistDisplayProps> = ({ playlist }) => {
             >Play on Spotify</button>
             <button className="preferences-button" onClick={() => {
                 window.location.href = "/preferences";
-            }}>Edit preferences</button>
+            }}>Edit preferences <img className="gear" src="../src/assets/gear.png"></img></button>
         </div>
     </div>
   );
