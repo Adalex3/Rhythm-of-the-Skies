@@ -1,5 +1,5 @@
 import React from 'react';
-import LoggedInName from '../components/LoggedInName';
+import ProfileDisplay from '../components/ProfileDisplay.tsx';
 import BlueSkyBackground from '../components/backgrounds/BlueSkyBackground';
 import WhiteCloudsBackground from '../components/backgrounds/WhiteCloudsBackground';
 import SunBackground from '../components/backgrounds/SunBackground';
@@ -14,7 +14,7 @@ const PreferencesPage: React.FC = () => {
                         cloudCount={10}
                         cloudSpeed={1}
                         cloudSize={1}/>   */}
-            <LoggedInName />
+            <ProfileDisplay username="Alex Hynds" />
             <PreferenceUI />
         </>
     );
