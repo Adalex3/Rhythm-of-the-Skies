@@ -101,10 +101,39 @@ const PreferenceUI: React.FC = () => {
     };
 
     // Adds submission/save button
-    const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        // setFormData(defaltFormData);
+    const onSubmit = async () => {
+        const data = {
+            userLocation: location,
+            sunnyGenres: setSunnySelectedGenres,
+            cloudyGenres: setCloudySelectedGenres,
+            rainyGenres: setRainySelectedGenres,
+            snowyGenres: setSnowySelectedGenres,
+            nightGenres: setNightSelectedGenres
+        };
+
+        // TODO - Joanne
+        
+        // try {
+        //     const response = await fetch ("url", {
+        //         method: "POST",
+        //         headers: {
+        //             "Constent-Type": "application/json",
+        //         },
+        //         body: JSON.stringify(data),
+        //     });
+
+        //     if (response.ok) {
+        //         alert("Preferences and location saved")
+        //     } else {
+        //         console.error("Failed to save ", response.statusText);
+        //         alert("Error saving prereference and loaction.");
+        //     }
+        // } catch (error) {
+        //     console.error("Error saving ", error);
+        //     alert("Error connecting to the server");
+        // }
     }
+        
 
     return (
         <>
@@ -124,7 +153,7 @@ const PreferenceUI: React.FC = () => {
             <h1>Musical Preferences</h1>
             
             <div className="outline">
-                <form onSubmit={onSubmit}>                       
+                                     
                     {/* Sunny day preference */}
                     
                     <div className='container' onBlur={handleBlur}>
@@ -457,9 +486,9 @@ const PreferenceUI: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                </form>
+                
             </div>
-            <button className='pref-submit-btn' type="submit">Save</button>
+            <button onClick={onSubmit} className='pref-submit-btn'>Save</button>
         </>
     );
 };
@@ -467,4 +496,3 @@ const PreferenceUI: React.FC = () => {
 <br />
 
 export default PreferenceUI;
-
