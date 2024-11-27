@@ -193,6 +193,15 @@ body .loggedin-user {
   border: solid 4px #fff;
 }
 
+.pref-location {
+  font-family: "VT323", monospace;
+    font-size: 2rem;
+    width: 50%;
+    padding: 10px;
+    margin-Bottom: 10px;
+    border: 1px solid #ccc;
+    border-Radius: 4px;
+}
 
 .pref-gen-search{
     font-family: "VT323", monospace;
@@ -202,7 +211,6 @@ body .loggedin-user {
     margin-Bottom: 10px;
     border: 1px solid #ccc;
     border-Radius: 4px;
-
 }
 
 .pref-gen-check{ 
