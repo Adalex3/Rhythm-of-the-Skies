@@ -163,9 +163,25 @@ h4 {
 
 .loggedin-user {
   font-family: "VT323", monospace;
-  float: right;
+  color:#2D2A3A;
+  padding: 10px;
   font-size: 1.3em;
 }
+
+body .loggedin-user {
+  top: 30px;
+  right: 50px;
+  flex-direction: column;
+  align-items: center;
+  position: fixed; 
+  display: flex;
+}
+
+.profile-pic {
+  width: 70px;
+  height: 70px;
+}
+
 .container {
   display: flex;
   flex-shrink: 0;
