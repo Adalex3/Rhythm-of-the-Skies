@@ -1,3 +1,5 @@
+import pfp from '../images/pfp.png'
+
 function LoggedInName() {
     var user = {}
     function doLogout(event: any): void {
@@ -6,9 +8,12 @@ function LoggedInName() {
     };
     return (
         <div className="loggedin-user" id="loggedInDiv">
-            <span id="userName">John Doe</span><br />
-            <button type="button" id="logoutButton" className="buttons"
-                onClick={doLogout}>Sign out</button>
+            <img src={pfp} className='profile-pic' />
+            <div>
+                <span id="userName">John Doe</span><br />
+                <button type="button" id="logoutButton" className="buttons"
+                    onClick={doLogout}>Sign out</button>
+            </div>
         </div>
     );
 };
