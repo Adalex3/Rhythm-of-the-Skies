@@ -104,11 +104,11 @@ const PreferenceUI: React.FC = () => {
     const onSubmit = async () => {
         const data = {
             userLocation: location,
-            sunnyGenres: setSunnySelectedGenres,
-            cloudyGenres: setCloudySelectedGenres,
-            rainyGenres: setRainySelectedGenres,
-            snowyGenres: setSnowySelectedGenres,
-            nightGenres: setNightSelectedGenres
+            sunnyGenres: sunnySelectedGenres,
+            cloudyGenres: cloudySelectedGenres,
+            rainyGenres: rainySelectedGenres,
+            snowyGenres: snowySelectedGenres,
+            nightGenres: nightSelectedGenres
         };
 
         // TODO - Joanne
@@ -144,7 +144,7 @@ const PreferenceUI: React.FC = () => {
             </div>
             <div className='location'>
                 <h2>Enter Location: </h2>
-                <input className="pref-gen-search" name='location' id="location"
+                <input className="pref-location" name='location' id="location"
                     type="text"
                     placeholder="City, State"
                 />
