@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import sunny from '../images/Sunny.png'
-import cloudy from '../images/Cloudy.png'
-import rainy from '../images/rainy.png'
-import snowy from '../images/Snowy.png'
-import moon from '../images/moon.png'
+import sunny from '../images/pxSunny.png'
+import cloudy from '../images/pxCloudy.png'
+import rainy from '../images/pxRainy.png'
+import snowy from '../images/pxSnowy.png'
+import night from '../images/pxNight.png'
 import preferences_rainbow from '../images/preferences_rainbow.png'
 
 
@@ -115,7 +115,10 @@ const PreferenceUI: React.FC = () => {
             </div>
             <div className='location'>
                 <h2>Enter Location: </h2>
-
+                <input className="pref-gen-search" name='location' id="location"
+                    type="text"
+                    placeholder="City, State"
+                />
             </div>
 
             <h1>Musical Preferences</h1>
@@ -194,7 +197,7 @@ const PreferenceUI: React.FC = () => {
                     
                     <div className='container' onBlur={handleBlur}>
                         <div >
-                            <img style={{ width: "60%" }} src={sunny} />
+                            <img style={{ width: "60%" }} src={night} />
                             <div>
                                 <h2><strong>Night</strong></h2>
                             </div>
