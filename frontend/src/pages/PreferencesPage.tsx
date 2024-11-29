@@ -6,6 +6,7 @@ import SunBackground from '../components/backgrounds/SunBackground';
 import PreferenceUI from  '../components/PreferenceUI.tsx'
 
 const PreferencesPage: React.FC = () => {
+
     return (
         <>
             {/* <BlueSkyBackground />
@@ -14,8 +15,8 @@ const PreferencesPage: React.FC = () => {
                         cloudCount={10}
                         cloudSpeed={1}
                         cloudSize={1}/>   */}
+            <PreferenceUI location="Orlando, FL"/>
             <ProfileDisplay username="Alex Hynds" />
-            <PreferenceUI />
         </>
     );
 };
