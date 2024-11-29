@@ -129,7 +129,7 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
             nightGenres: nightSelectedGenres
         };
 
-        // TODO - Joanne
+        // Joanne TODO: saves to the "url" 
         
         // try {
         //     const response = await fetch ("url", {

@@ -72,11 +72,31 @@ const MainPage: React.FC = () => {
             try {
                 // TODO: GET WEATHER FROM API (JOANNE)
 
+                var locationStr = localStorage.getItem("user_location") ?? "NO LOCATION"; // TODO: Add support for no location
 
-                const api_weather = {condition: "Clear", location: "Orlando", temp: 54.0};
-                    setWeather(api_weather);
-                    fetchPlaylist(api_weather);
-                return // TEMPORARY!
+                // Process location string
+                // We are going to be compatible with three different options:
+                // 1: City Name ("Orlando")
+                // 2: City Name + State Abb. ("Orlando, FL")
+                // 3: City Name + Full State Name ("Orlando, Florida")
+
+                var cityName = "";
+                var stateName = "";
+
+                // First filter extraneous spaces around the comma
+                if(locationStr.includes(",")) {
+                    locationStr = locationStr.replace(" ,",",");
+                    locationStr = locationStr.replace(", ",",");
+
+                    // Has city + state (somehow)
+                    cityName = locationStr.split(",")[0];
+                    stateName = locationStr.split(",")[1] ?? "";
+                } else {
+                    // Only city name
+                    cityName = locationStr;
+                }
+
+                // Now we should have a cityName that adheres to the requirements, and a stateName that does
 
                 const response = await axios.get('http://localhost:5000/api/coord', {
                     params : {
