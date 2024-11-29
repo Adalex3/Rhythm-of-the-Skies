@@ -129,7 +129,7 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
             nightGenres: nightSelectedGenres
         };
 
-        // Joanne TODO: saves to the "url" 
+        // Joanne TODO: location and weather preference data are submitted to the "url"  
         
         // try {
         //     const response = await fetch ("url", {
