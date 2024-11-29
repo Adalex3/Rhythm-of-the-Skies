@@ -5,7 +5,14 @@ import rainy from '../images/pxRainy.png'
 import snowy from '../images/pxSnowy.png'
 import night from '../images/pxNight.png'
 import preferences_rainbow from '../images/preferences_rainbow.png'
+import { LocationContext } from '../pages/PreferencesPage';
 
+// Alex TO-DO: how do you edit this to communicate with
+// your main page so the user's location selection here
+// reflects on main?
+interface PreferencesProps {
+    location: string;
+  }
 
 const genres = [
     "acoustic", "afrobeat", "alt-rock", "alternative", "ambient", "anime",
@@ -29,7 +36,7 @@ const genres = [
     "work-out", "world-music"
 ];
 
-const PreferenceUI: React.FC = () => {
+const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
     // const [searchTerm, setSearchTerm] = useState("");
     // const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
 
@@ -55,6 +62,17 @@ const PreferenceUI: React.FC = () => {
     const [rainyActive, setRainyActive] = useState(false);
     const [snowyActive, setSnowyActive] = useState(false);
     const [nightActive, setNightActive] = useState(false);
+
+    // Tracks location information
+    const [cityName, setCityName] = useState(''); 
+    const [stateName, setStateName] = useState(''); 
+
+    // Location search term
+    const [locationSearchTerm, setLocationSearchTerm] = useState("");
+
+    // Visibility of locations
+    const [locationActive, setLocationActive] = useState(false);
+
 
     // The behavior of the checkbox list
     const handleCheckboxChange = (
@@ -100,7 +118,6 @@ const PreferenceUI: React.FC = () => {
         }
     };
 
-    // Adds submission/save button
     const onSubmit = async () => {
         const data = {
             userLocation: location,
@@ -133,7 +150,10 @@ const PreferenceUI: React.FC = () => {
         //     alert("Error connecting to the server");
         // }
     }
-        
+
+    const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setLocationSearchTerm(e.target.value); // Update the search bar value
+    };
 
     return (
         <>
@@ -142,18 +162,39 @@ const PreferenceUI: React.FC = () => {
             <div className="header">
                 <header id="pref_title">Rhythm of the Skies</header> 
             </div>
-            <div className='location'>
-                <h2>Enter Location: </h2>
-                <input className="pref-location" name='location' id="location"
-                    type="text"
-                    placeholder="City, State"
-                />
+            
+            {/* Location container */}
+            <div className='location_container'>
+                <form onSubmit={onSubmit}>
+                <div className='container' onBlur={handleBlur}>
+                        <div style={{ width: "90%" }}>
+                            <h2>Selected Location: </h2>
+                            <location_text><strong>{location}</strong></location_text>
+
+                        </div>
+                        <div style={{ width: "115%" }}>
+                            <h3>Change Location:</h3>
+                            {/* Search Bar */}
+                            {/* Joanne and Cora To-Do thingy:
+                                this is the location search bar.
+                                The "Save" button below should save the new location" */}
+                            <input className="pref-gen-search"
+                                type="text"
+                                placeholder="Search city/state..."
+                                value={locationSearchTerm}
+                                onChange={handleLocationChange}
+                            />
+
+                        </div>
+                    </div>
+                </form>
+               
             </div>
 
             <h1>Musical Preferences</h1>
             
             <div className="outline">
-                                     
+                <form onSubmit={onSubmit}>                       
                     {/* Sunny day preference */}
                     
                     <div className='container' onBlur={handleBlur}>
@@ -161,7 +202,7 @@ const PreferenceUI: React.FC = () => {
                             <img style={{ width: "60%" }} src={sunny} />
                             <div>
                                 <h2><strong>Sunny</strong></h2>
-                            </div>
+                             </div>
                         </div>
                         <div style={{ width: "200%" }}>
                             <h3>I want to hear...</h3>
@@ -486,9 +527,9 @@ const PreferenceUI: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                
+                </form>
             </div>
-            <button onClick={onSubmit} className='pref-submit-btn'>Save</button>
+            <button className='pref-submit-btn' type="submit">Save</button>
         </>
     );
 };
@@ -496,3 +537,4 @@ const PreferenceUI: React.FC = () => {
 <br />
 
 export default PreferenceUI;
+
