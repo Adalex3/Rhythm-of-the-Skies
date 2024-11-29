@@ -15,6 +15,7 @@ const PreferencesPage: React.FC = () => {
                         cloudCount={10}
                         cloudSpeed={1}
                         cloudSize={1}/>   */}
+            // Alex: this is where i passed the location string!
             <PreferenceUI location="Orlando, FL"/>
             <ProfileDisplay username="Alex Hynds" />
         </>
