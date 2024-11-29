@@ -7,6 +7,7 @@ import PreferenceUI from  '../components/PreferenceUI.tsx'
 
 const PreferencesPage: React.FC = () => {
 
+
     return (
         <>
             {/* <BlueSkyBackground />

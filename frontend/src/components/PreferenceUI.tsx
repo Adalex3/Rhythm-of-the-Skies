@@ -69,6 +69,7 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
 
     // Location search term
     const [locationSearchTerm, setLocationSearchTerm] = useState("");
+    const [locationDisplay, setLocationDisplay] = useState(location);
 
     // Visibility of locations
     const [locationActive, setLocationActive] = useState(false);
@@ -155,6 +156,17 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
         setLocationSearchTerm(e.target.value); // Update the search bar value
     };
 
+    const handleLocationSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        console.log('Enter pressed:', locationSearchTerm);
+
+        // Set the localStorage location to be the search field value
+        const textFieldStr = locationSearchTerm;
+        localStorage.setItem("user_location",textFieldStr);
+
+        setLocationDisplay(textFieldStr);
+    };
+
     return (
         <>
             <div className="background"></div>
@@ -165,11 +177,11 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
             
             {/* Location container */}
             <div className='location_container'>
-                <form onSubmit={onSubmit}>
+                <form onSubmit={handleLocationSubmit}>
                 <div className='container' onBlur={handleBlur}>
                         <div style={{ width: "90%" }}>
                             <h2>Selected Location: </h2>
-                            <location_text><strong>{location}</strong></location_text>
+                            <location_text><strong>{locationDisplay}</strong></location_text>
 
                         </div>
                         <div style={{ width: "115%" }}>

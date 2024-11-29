@@ -76,7 +76,7 @@ const MainPage: React.FC = () => {
                 const api_weather = {condition: "Clear", location: "Orlando", temp: 54.0};
                     setWeather(api_weather);
                     fetchPlaylist(api_weather);
-                return
+                return // TEMPORARY!
 
                 const response = await axios.get('http://localhost:5000/api/coord', {
                     params : {

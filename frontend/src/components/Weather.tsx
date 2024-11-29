@@ -25,7 +25,7 @@ function Weather()
   const handleSearch = async() =>
   {
     try {
-      // I had to specify localhost:5000!
+      // I had to specify localhost:5000! CORS >:(
       const response = await axios.get('http://localhost:5000/api/coord', {
         params : {
           cityName:cityName,
