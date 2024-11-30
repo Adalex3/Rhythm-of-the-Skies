@@ -21,6 +21,8 @@ interface Weather {
     temp: number;
     condition: string;
     location: string;
+    lat: number;
+    lon: number;
   }
   
 interface Song {
@@ -63,11 +65,21 @@ const MainPage: React.FC = () => {
     // const [coordinates, setCoordinates] = useState<Coordinate[]>([]);
 
     useEffect(() => {
+        // CORA: Fetch Spotify playlist based on weather
         const fetchPlaylist = async (weather: Weather) => {
-            // TODO: CORA & JOANNE ADD PLAYLIST API
-            const api_playlist = playlist1; // SAMPLE DATA, remove later
-            setPlaylist(api_playlist);
-        }
+            try {
+                const response = await axios.post('http://localhost:5000/api/playlist', {
+                    userId: "USER_ID", // Replace with actual user ID
+                    // lat: weather.lat, // Assuming weather API returns lat/lon
+                    // lon: weather.lon,
+                    weatherCondition: weather.condition,
+                });
+                setPlaylist(response.data); // CORA: Update state with playlist data from backend.
+            } catch (error) {
+                console.error("Error fetching Spotify playlist:", error);
+            }
+        };
+        
         const fetchWeather = async () => {
             try {
                 // TODO: GET WEATHER FROM API (JOANNE)
@@ -136,13 +148,6 @@ const MainPage: React.FC = () => {
                 else {
                     console.error('Coordinates not found!');
                 }
-        
-                // setCoordinates(coordinates);
-
-                
-                // const api_weather = {condition: "Clear", location: "Orlanfdsfdo", temp: 70.0};
-                // setWeather(api_weather);
-                // fetchPlaylist(api_weather);
             } catch (error) {
                 console.error('Error fetching weather data:', error);
             }
