@@ -130,6 +130,9 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
         };
 
         // Joanne TODO: location and weather preference data are submitted to the "url"  
+
+        console.log(data.userLocation);
+        console.log(data.sunnyGenres);
         
         // try {
         //     const response = await fetch ("url", {
@@ -181,7 +184,7 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
                 <div className='container' onBlur={handleBlur}>
                         <div style={{ width: "90%" }}>
                             <h2>Selected Location: </h2>
-                            <location_text><strong>{locationDisplay}</strong></location_text>
+                            <strong>{locationDisplay}</strong>
 
                         </div>
                         <div style={{ width: "115%" }}>
@@ -541,7 +544,7 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
                     </div>
                 </form>
             </div>
-            <button className='pref-submit-btn' type="submit">Save</button>
+            <button className='pref-submit-btn' type="submit" onClick={onSubmit}>Save</button>
         </>
     );
 };
