@@ -182,13 +182,12 @@ app.post('/api/addPreference', async (req, res, next) => {
     // assumes an array of genres of size at least 1 is passed for one weatherCondition for one user
     // userId is an objectId. weatherCondition should be used to get objectId. Same with genre
 
-    // console.log('Inside addPreference');
+    console.log('Inside addPreference');
 
     // Remember, another part of this is I need to add the preference to the user in Users
     // To add it to the Users collection, essentially swap _id and user_id
     // On second thought, adding preference is updating the already existing user in Users
-    
-    
+        
     client.connect();
 
     // Assumes that the userId passed is already and ObjectId()
@@ -208,19 +207,29 @@ app.post('/api/addPreference', async (req, res, next) => {
     });
 
     // Now we successfully get the weather object id back
-    // console.log(weatherResponse.data.resultId);
+    // console.log("Weather response:");
+    // console.log(weatherResponse.data);
 
-    let weatherId = new ObjectId(String(weatherResponse.data.resultId));
+    let weatherId = new ObjectId(String(weatherResponse.data));
 
     // res.send('Preference added');
 
-    const genreArray = genre.split(" ");
+    // const genreArray = genre.split(" ");
     // console.log(genre_array);
+
+    // CORA: Added a check to ensure no more than 5 genres are submitted.
+    if (genre.length > 5) {
+        return res.status(400).json({
+            error: "You can only associate up to 5 genres with a single weather condition.", // Respond with an error message.
+        });
+    }
+
+    // console.log("genre array: ", genre);
 
     const genreResponses = [];
 
     // Assumes genre is an array of at least one item
-    for (let g of genreArray) {
+    for (let g of genre) {
         // console.log(g)
         const genreResponse = await axios.get('http://localhost:5000/api/getGenreId', {
             params : {
@@ -228,9 +237,101 @@ app.post('/api/addPreference', async (req, res, next) => {
             },
         });
 
-        // console.log(genreResponse.data.resultId);
+        console.log(genreResponse.data);
 
-        let genre_objectId = new ObjectId(String(genreResponse.data.resultId));
+        let genre_objectId = new ObjectId(String(genreResponse.data));
+
+        // console.log("Genre object id", genre_objectId);
+
+        genreResponses.push(genre_objectId);
+    }
+
+    // console.log(genreResponses);
+    
+
+    const newPref = { user_id:userId,  weatherCondition:weatherId, associatedGenres:genreResponses};
+
+    console.log(newPref);
+
+    const db = client.db();
+
+    try {
+        // CORA: Check if a preference for this weather condition already exists for the user.
+        const existingPreference = await db.collection('UserPreference').findOne({
+            user_id: userId,
+            weatherCondition: weatherId,
+        });
+
+        if (existingPreference) {
+            return res.status(400).json({
+                error: "Preference for this weather condition already exists. Use the update endpoint to modify it.", // Respond with an error message.
+            });
+        }
+
+        const result_addpref = await db.collection('UserPreference').insertOne(newPref);
+        console.log(`User Preference inserted with _id: ${result_addpref.insertedId}`);
+
+        const result_updateuser = await db.collection('Users').updateOne(
+            { _id : userId},
+            { $push: { preferences : result_addpref.insertedId}}
+        );
+
+        res.status(201).json({
+            message: "Preference added successfully.", // Success message.
+            preferenceId: result_addpref.insertedId, // Return the new preference ID.
+        });
+
+    } catch(err) {
+        console.error('Error inserting document:', err);
+    }
+});
+
+app.post('/api/updatePreference', async (req, res, next) => {
+    // Takes in the userId and updates the genre list with tne new genre list
+    client.connect();
+
+    // Updating the preference should change the list of genres in UserPreference
+    // it might also need to change the list in Users?
+
+    let { userId, weatherCondition, genre } = req.body;
+
+    userId = userId ? new ObjectId(String(userId)) : '';
+
+    const weatherResponse = await axios.get('http://localhost:5000/api/getWeatherCondition', {
+        params : {
+            weatherName:weatherCondition,
+        },
+    });
+
+    // Now we successfully get the weather object id back
+
+    let weatherId = new ObjectId(String(weatherResponse.data));
+
+    // res.send('Preference added');
+
+    // const genreArray = genre.split(" ");
+    // console.log(genre_array);
+
+    // CORA: Added a check to ensure no more than 5 genres are submitted.
+    if (genre.length > 5) {
+        return res.status(400).json({
+            error: "You can only associate up to 5 genres with a single weather condition.", // Respond with an error message.
+        });
+    }
+
+    const genreResponses = [];
+
+    // Assumes genre is an array of at least one item
+    for (let g of genre) {
+        // console.log(g)
+        const genreResponse = await axios.get('http://localhost:5000/api/getGenreId', {
+            params : {
+                genreName:g,
+            },
+        });
+
+
+        let genre_objectId = new ObjectId(String(genreResponse.data));
 
         // console.log(genre_objectId);
 
@@ -247,38 +348,45 @@ app.post('/api/addPreference', async (req, res, next) => {
     const db = client.db();
 
     try {
-        const result_addpref = await db.collection('UserPreference').insertOne(newPref);
-        console.log(`User Preference inserted with _id: ${result_addpref.insertedId}`);
-
-        const result_updateuser = await db.collection('Users').updateOne(
-            { _id : userId},
-            { $push: { preferences : result_addpref.insertedId}}
+        // $set replaces the old value with the new one
+        const result_updatepref = await db.collection('UserPreference').updateOne(
+            { user_id: userId, weatherCondition:weatherId },
+            { $set: { associatedGenres :  genreResponses } }
         );
 
+        // Since it exists already, the inserted id should already be in Users so don't need to call this
+        // const result_updateuser = await db.collection('Users').updateOne(
+        //     { _id : userId},
+        //     { $push: { preferences : result_addpref.insertedId}}
+        // );
+        if (result_updatepref.acknowledged) {
+            res.status(201).json({
+                message: "Preference updated successfully.", // Success message.
+                preference_ack: result_updatepref.acknowledged, // Return the updated preference acknowledgement.
+            });
+        } else {
+            res.status(404).json({
+                message: "Preference did not update successfully.", // Success message.
+                preference_ack: result_updatepref.acknowledged, // Return the updated preference acknowledgement.
+            });
+        }
+        
+
     } catch(err) {
-        console.error('Error inserting document:', err);
+        console.error('Error updating document:', err);
     }
-});
-
-app.get('/api/updatePreference', async (req, res, next) => {
-    // Takes in the userId and updates the genre list with tne new genre list
-    client.connect();
-
-    // Updating the preference should change the list of genres in UserPreference
-    // it might also need to change the list in Users?
-
-    let { userId, genreList } = req.query(); 
-
-    userId = userId ? new ObjectId(String(userId)) : '';
-
-
 });
 
 app.get('/api/getPreference', async (req, res, next) => {
     client.connect();
 
+    console.log("Inside getPreference");
+
     // Gets the list of genres when given weather name
-    const { userId, weatherCondition } = req.query;
+    let { userId, weatherCondition } = req.query;
+
+    // console.log("userId:", userId);
+    // console.log("weatherCondition", weatherCondition)
 
     userId = userId ? new ObjectId(String(userId)) : '';
 
@@ -288,14 +396,17 @@ app.get('/api/getPreference', async (req, res, next) => {
         },
     });
 
-    let weatherId = new ObjectId(String(weatherResponse.data.resultId));
+    // console.log(weatherResponse.data);
+
+    let weatherId = new ObjectId(String(weatherResponse.data));
+    // console.log("weatherId gained from search: ", weatherId);
 
 
     const db = client.db();
     const collection = db.collection('UserPreference');
 
     try {
-        // console.log(`About to search: ${weatherId}`);
+        console.log(`About to search: ${weatherId}`);
         const result = await collection.findOne(
             { 
                 "user_id" : userId,
@@ -303,35 +414,37 @@ app.get('/api/getPreference', async (req, res, next) => {
             }
         );
 
+        // console.log("weatherId: ", weatherId);
+        // console.log(result);
+
         if (result) {
             console.log('Successfully got preferences');
-        } else {
+
+            let genreArray = result.associatedGenres;
+
+            // console.log(genreArray);
+
+            let genreNames = [];
+
+            for (let g of genreArray) {
+                const genreResponse = await axios.get('http://localhost:5000/api/getGenreName', {
+                    params : {
+                        genreId:g,
+                    },
+                });
+
+                let genreName = genreResponse.data.genreName;
+
+                genreNames.push(genreName);
+            }
+
+            // console.log(genreNames);
+            res.status(200).json(genreNames);
+        } else { 
             console.log('Did not get preferences');
-            console.log(userId);
+            res.status(200).json([]);
+            // console.log(userId);
         }
-
-        let genreArray = result.associatedGenres;
-
-        // console.log(genreArray);
-
-        let genreNames = [];
-
-        for (let g of genreArray) {
-            const genreResponse = await axios.get('http://localhost:5000/api/getGenreName', {
-                params : {
-                    genreId:g,
-                },
-            });
-
-            let genreName = genreResponse.data.genreName;
-
-            genreNames.push(genreName);
-        }
-
-        // console.log(genreNames);
-        res.status(200).json(genreNames);
-        
-
     } catch(err) {
         console.error('Error getting preferences:', err);
         res.status(404);
@@ -405,11 +518,14 @@ app.get('/api/getWeatherCondition', async (req, res, next) => {
 
     var error = '';
 
-    let { weatherName } = req.body;
+    let { weatherName } = req.query;
 
-    weatherName = weatherName ? String(weatherName).trim() : '';
+    console.log("inside getWeatherCondition");
+    console.log(weatherName);
 
-    // console.log(weatherName);
+    // weatherName = weatherName ? String(weatherName).trim() : '';
+
+    // console.log("Searching id of: ", weatherName);
 
 
     const db = client.db();
@@ -417,24 +533,27 @@ app.get('/api/getWeatherCondition', async (req, res, next) => {
     try {
         const result = await db.collection('WeatherConditions')
                 .findOne(
-                    { "condition_name": { $regex: weatherName, $options: 'i'}});
+                    { "condition_name": weatherName});
                 
 
         // console.log(result);
 
         if (result) {
-            var ret = { resultId:result._id, error:error };
+            // var ret = { resultId:result._id, error:error };
             // console.log(ret)
-            res.status(200).json(ret);
+            // res.status(200).json(ret);
+            res.status(200).json(result._id);
         } else {
-            error = '_id of weather condition is null';
-            var ret = { resultId:result, error:error };
-            // console.log(ret)
-            res.status(404).json(ret)
+            // error = '_id of weather condition is null';
+            // var ret = { resultId:result, error:error };
+            // // console.log(ret)
+            // res.status(404).json(ret)
+            res.status(200).json('');
         }
      
     } catch (error) {
         console.log('Error occurred during query:', error);
+        res.status(404).json('');
     }
 
 });
@@ -444,22 +563,26 @@ app.get('/api/getGenreId', async (req, res, next) => {
 
     var error = '';
 
-    let { genreName } = req.body;
+    let { genreName } = req.query;
 
     genreName = genreName ? String(genreName).trim() : '';
+
+    // console.log("genreName: ", genreName);
 
     const db = client.db();
 
     const result = await db.collection('Genre')
-                    .findOne({ "genre_name": { $regex: genreName, $options: 'i'}});
+                    .findOne({ "genre_id": genreName});
+
+    // console.log(result);
 
     if (result) {
-        var ret = { resultId:result._id, error:error };
-        res.status(200).json(ret);
+        // var ret = { resultId:result._id, error:error };
+        res.status(200).json(result._id);
     } else {
-        error = '_id of genre is null';
-        var ret = { resultId:result, error:error };
-        res.status(404).json(ret)
+        // error = '_id of genre is null';
+        // var ret = { resultId:result, error:error };
+        res.status(404).json('')
     }
 });
 

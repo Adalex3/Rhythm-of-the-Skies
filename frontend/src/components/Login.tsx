@@ -9,7 +9,7 @@ function Login() {
         // TODO: Ayesha add Spotify API!
         console.log("LOGGING IN WITH SPOTIFY...");
 
-        const spotify_id = 0; // temp value, replace with USER ID
+        const spotify_id = '67412fc6e0c5e59a30c1e534'; // temp value, replace with USER ID
 
         // Once Spotify is logged in...
         localStorage.setItem("user_id",String(spotify_id));

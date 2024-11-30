@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import sunny from '../images/pxSunny.png'
 import cloudy from '../images/pxCloudy.png'
 import rainy from '../images/pxRainy.png'
@@ -131,28 +132,93 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
 
         // Joanne TODO: location and weather preference data are submitted to the "url"  
 
-        console.log(data.userLocation);
-        console.log(data.sunnyGenres);
-        
-        // try {
-        //     const response = await fetch ("url", {
-        //         method: "POST",
-        //         headers: {
-        //             "Constent-Type": "application/json",
-        //         },
-        //         body: JSON.stringify(data),
-        //     });
+        try {
+            // First do get to see if the user has any preferences connected to them
+            // if so, do update
+            // if not, then add
 
-        //     if (response.ok) {
-        //         alert("Preferences and location saved")
-        //     } else {
-        //         console.error("Failed to save ", response.statusText);
-        //         alert("Error saving prereference and loaction.");
-        //     }
-        // } catch (error) {
-        //     console.error("Error saving ", error);
-        //     alert("Error connecting to the server");
-        // }
+            let userId = localStorage.getItem("user_id")
+            // console.log(userId);
+
+            let weatherConditions = ["sunny", "night", "cloudy", "rainy", "snowy"];
+            let weatherGenres = [data.sunnyGenres, data.nightGenres, data.cloudyGenres, data.rainyGenres, data.snowyGenres];
+
+            // let weatherConditions = ["sunny"];
+            // let weatherGenres = [data.sunnyGenres];
+
+            for (let i = 0; i < weatherConditions.length; i++) {
+                let wC = weatherConditions[i]
+                
+                console.log("Currently on: ", wC);
+
+
+                let check_exist = await axios.get('http://localhost:5000/api/getPreference', {
+                    params:{
+                        userId:userId,
+                        weatherCondition:wC,
+                    },
+                })
+
+                console.log("Just checked for existence");
+
+                let exists = false;
+
+                if (check_exist.data.length > 0) {
+                    exists = true;
+                }
+
+                if (exists) {
+                    console.log(wC, " exists");
+                    // Update
+                    try {
+                        let update_pref = await axios.post('http://localhost:5000/api/updatePreference', {
+                            userId:userId,
+                            weatherCondition:wC,
+                            genre:weatherGenres[i],
+                        });
+
+                        // if (update_pref.status == 201) {
+                        //     console.log("Update successful for ", wC);
+                        // } else {
+                        //     console.log("Update unsuccessful for ", wC);
+                        // }
+
+                        console.log("Update successful for ", wC);
+                    } catch (error) {
+                        console.log("Update unsuccessful for ", wC);
+                        alert(error);
+                    }
+                } else {
+                    console.log(wC," does not exist");
+                    // Add
+                    try {
+
+                        console.log("Passing the following to add preference:");
+                        console.log(wC);
+                        console.log(weatherGenres[i]);
+
+
+
+                        let add_pref = await axios.post('http://localhost:5000/api/addPreference', {
+                            userId:userId,
+                            weatherCondition:wC,
+                            genre:weatherGenres[i],
+                        });
+
+                        console.log("Add successful for ", wC);
+                    } catch (error) {
+                        console.log("Add unsuccessful for ", wC);
+                        alert(error);
+                    }
+
+                }
+            }
+
+            
+        } catch (error) {
+            console.error("Error saving ", error);
+            alert("Error connecting to the server");
+        }
     }
 
     const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
