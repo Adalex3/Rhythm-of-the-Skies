@@ -95,8 +95,10 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
     const handleRemoveGenre = (
         genre: string,
         selectedGenres: string[],
-        setSelectedGenres: React.Dispatch<React.SetStateAction<string[]>>
+        setSelectedGenres: React.Dispatch<React.SetStateAction<string[]>>,
+        event: React.FormEvent | React.MouseEvent
     ) => {
+        event.preventDefault();
         setSelectedGenres((prevSelected) =>
             prevSelected.filter((g) => g !== genre)
         );
@@ -159,17 +161,17 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
                     },
                 })
 
-                console.log("Just checked for existence");
+                // console.log("Just checked for existence");
 
                 let exists = false;
 
-                if (check_exist.data.length > 0) {
+                if (check_exist.data) {
                     exists = true;
                 }
 
-                if (exists) {
-                    console.log(wC, " exists");
-                    // Update
+                if (exists && check_exist.data.length > 0) {
+                    console.log(wC, " exists and we update");
+                    // Update if exists and new preference is a list of genres
                     try {
                         let update_pref = await axios.post('http://localhost:5000/api/updatePreference', {
                             userId:userId,
@@ -188,14 +190,14 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
                         console.log("Update unsuccessful for ", wC);
                         alert(error);
                     }
-                } else {
-                    console.log(wC," does not exist");
-                    // Add
+                } else if ((!exists) && check_exist.data.length > 0) {
+                    console.log(wC," does not exist and we add");
+                    // Add if entry does not exist and new preference is a list with genres
                     try {
 
-                        console.log("Passing the following to add preference:");
-                        console.log(wC);
-                        console.log(weatherGenres[i]);
+                        // console.log("Passing the following to add preference:");
+                        // console.log(wC);
+                        // console.log(weatherGenres[i]);
 
 
 
@@ -210,7 +212,28 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
                         console.log("Add unsuccessful for ", wC);
                         alert(error);
                     }
+                } else if (exists && check_exist.data.length == 0) {
+                    // Delete if the entry exists but the newPreference has no genres
+                    console.log(wC," exists and we delete");
 
+                    try {
+                        let delete_pref = await axios.get('http://localhost:5000/api/deletePreference', {
+                            params : {
+                                userId:userId,
+                                weatherCondition:wC,
+                            },
+                        });
+
+                        if (delete_pref) {
+                            console.log("Delete successful for ", wC);
+                        } else {
+                            console.log("Delete unsuccessful for ", wC);
+                        }
+                            
+                    } catch (error) {
+                        console.log("Delete unsuccessful for ", wC);
+                        alert(error);
+                    }
                 }
             }
 
@@ -326,11 +349,12 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
                                         {/* x button removes the genre when clicked */}
                                         <button
                                             className='pref-x-btn'
-                                            onClick={() =>
+                                            onClick={(e) =>
                                                 handleRemoveGenre(
                                                     genre,
                                                     sunnySelectedGenres,
-                                                    setSunnySelectedGenres
+                                                    setSunnySelectedGenres,
+                                                    e
                                                 )
                                             }
                                         >
@@ -394,11 +418,12 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
                                         {/* x button removes the genre when clicked */}
                                         <button
                                             className='pref-x-btn'
-                                            onClick={() =>
+                                            onClick={(e) =>
                                                 handleRemoveGenre(
                                                     genre,
                                                     nightSelectedGenres,
-                                                    setNightSelectedGenres
+                                                    setNightSelectedGenres,
+                                                    e
                                                 )
                                             }
                                         >
@@ -460,11 +485,12 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
                                         {/* x button removes the genre when clicked */}
                                         <button
                                             className='pref-x-btn'
-                                            onClick={() =>
+                                            onClick={(e) =>
                                                 handleRemoveGenre(
                                                     genre,
                                                     cloudySelectedGenres,
-                                                    setCloudySelectedGenres
+                                                    setCloudySelectedGenres,
+                                                    e
                                                 )
                                             }
                                         >
@@ -527,11 +553,12 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
                                         {/* x button removes the genre when clicked */}
                                         <button
                                             className='pref-x-btn'
-                                            onClick={() =>
+                                            onClick={(e) =>
                                                 handleRemoveGenre(
                                                     genre,
                                                     rainySelectedGenres,
-                                                    setRainySelectedGenres
+                                                    setRainySelectedGenres,
+                                                    e
                                                 )
                                             }
                                         >
@@ -594,11 +621,12 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
                                         {genre}
                                         <button
                                             className='pref-x-btn'
-                                            onClick={() =>
+                                            onClick={(e) =>
                                                 handleRemoveGenre(
                                                     genre,
                                                     snowySelectedGenres,
-                                                    setSnowySelectedGenres
+                                                    setSnowySelectedGenres,
+                                                    e
                                                 )
                                             }
                                         >

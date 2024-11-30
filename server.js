@@ -442,7 +442,7 @@ app.get('/api/getPreference', async (req, res, next) => {
             res.status(200).json(genreNames);
         } else { 
             console.log('Did not get preferences');
-            res.status(200).json([]);
+            res.status(200).json(false);
             // console.log(userId);
         }
     } catch(err) {
@@ -472,7 +472,11 @@ app.get('/api/deletePreference', async (req, res, next) => {
         },
     });
 
-    let weatherId = new ObjectId(String(weatherResponse.data.resultId));
+    let weatherId = new ObjectId(String(weatherResponse.data));
+
+    // console.log("Inside delete preference");
+    // console.log(userId);
+    // console.log(weatherId);
 
 
     const db = client.db();
@@ -488,6 +492,9 @@ app.get('/api/deletePreference', async (req, res, next) => {
             }
         );
 
+        // console.log("doc to delete:");
+        // console.log(docToDelete)
+
         const result = await collection.deleteOne(
             { 
                 "user_id" : userId,
@@ -495,21 +502,30 @@ app.get('/api/deletePreference', async (req, res, next) => {
             }
         );
 
+        // console.log("Result from deletion");
         // console.log(result);
 
         const result_updateuser = await db.collection('Users').updateOne(
             { _id : userId},
             { $pull: { preferences : docToDelete._id}}
         );
+
+        // console.log("Update user result");
+        // console.log(result_updateuser);
+
+        // console.log("Acknowledged:");
+        // console.log(result.acknowledged);
         
         if (result.acknowledged && result_updateuser) {
-            res.status(200);
+            console.log("Return status 200");
+            // have to add a value to return via json
+            res.status(200).json(true);
         }
 
-
+        // console.log("Outside if statement");
     } catch (error) {
         console.log(`Error deleting preference: ${error}`);
-        res.status(404);
+        res.status(404).json(false);
     }
 });
 
