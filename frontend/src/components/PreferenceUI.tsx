@@ -273,7 +273,7 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
                 <div className='container' onBlur={handleBlur}>
                         <div style={{ width: "90%" }}>
                             <h2>Selected Location: </h2>
-                            <strong>{locationDisplay}</strong>
+                            <location_text><strong>{locationDisplay}</strong></location_text>
 
                         </div>
                         <div style={{ width: "115%" }}>

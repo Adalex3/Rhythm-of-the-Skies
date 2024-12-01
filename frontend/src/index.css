@@ -303,7 +303,7 @@ figure img {
   border-radius: 10px;
 }
 
-.location {
+.location_container {
   background-color: #f3f3f3; 
   border-radius: 18px; 
   padding: 30px; 
@@ -454,4 +454,19 @@ button:hover .gear {
 .gear {
   width: 12px;
   transform: scale(160%);
+}
+
+location_text {
+  font-size: 2.0em;
+  font-family: "VT323", monospace;
+  line-height: 1.1;
+  color: #f3f3f3;
+  background-color: #253C78;
+  border-radius: 8px;
+  padding: 10px;
+  width: 80%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1;
+  border: 8px solid #253C78;
 }
