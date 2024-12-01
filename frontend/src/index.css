@@ -215,8 +215,8 @@ body .loggedin-user {
 
 .location-gen-search{
   font-family: "VT323", monospace;
-  font-size: 2rem;
-  width: 50%;
+  font-size: 1.5rem;
+  width: 60%;
   padding: 10px;
   margin-Bottom: 10px;
   border: 1px solid #ccc;
