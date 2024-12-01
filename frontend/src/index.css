@@ -213,6 +213,17 @@ body .loggedin-user {
     border-Radius: 4px;
 }
 
+.location-gen-search{
+  font-family: "VT323", monospace;
+  font-size: 2rem;
+  width: 50%;
+  padding: 10px;
+  margin-Bottom: 10px;
+  border: 1px solid #ccc;
+  border-Radius: 4px;
+  margin-top: 20px;
+}
+
 .pref-gen-check{ 
   font-family: "VT323", monospace;
   max-Height: 200px;
@@ -459,14 +470,33 @@ button:hover .gear {
 location_text {
   font-size: 2.0em;
   font-family: "VT323", monospace;
-  line-height: 1.1;
+  line-height: 0.8;
   color: #f3f3f3;
   background-color: #253C78;
   border-radius: 8px;
   padding: 10px;
-  width: 80%;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   position: relative;
   z-index: 1;
   border: 8px solid #253C78;
+  display: inline-block; 
+  margin-top: 10px;
+
+}
+
+location_heading {
+  font-size: 2.1em;
+  font-family: "VT323", monospace;
+  line-height: 0.8;
+  color: #2D2A3A;
+  display: block; 
+}
+
+locationSearchHead {
+  font-size: 2.1em;
+  font-family: "VT323", monospace;
+  line-height: 0.8;
+  color: #2D2A3A;
+  display: block; 
+  margin-top: 20px;
 }

@@ -271,18 +271,18 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
             <div className='location_container'>
                 <form onSubmit={handleLocationSubmit}>
                 <div className='container' onBlur={handleBlur}>
-                        <div style={{ width: "90%" }}>
-                            <h2>Selected Location: </h2>
+                        <div style={{ width: "100%" }}>
+                            <location_heading>Selected Location: </location_heading>
                             <location_text><strong>{locationDisplay}</strong></location_text>
 
                         </div>
                         <div style={{ width: "115%" }}>
-                            <h3>Change Location:</h3>
+                            <locationSearchHead>Change Location:</locationSearchHead>
                             {/* Search Bar */}
                             {/* Joanne and Cora To-Do thingy:
                                 this is the location search bar.
                                 The "Save" button below should save the new location" */}
-                            <input className="pref-gen-search"
+                            <input className="location-gen-search"
                                 type="text"
                                 placeholder="Search city/state..."
                                 value={locationSearchTerm}
