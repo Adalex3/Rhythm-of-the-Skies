@@ -7,6 +7,7 @@ import snowy from '../images/pxSnowy.png'
 import night from '../images/pxNight.png'
 import preferences_rainbow from '../images/preferences_rainbow.png'
 import { LocationContext } from '../pages/PreferencesPage';
+import { useNavigate } from 'react-router-dom';
 
 // Alex TO-DO: how do you edit this to communicate with
 // your main page so the user's location selection here
@@ -122,7 +123,8 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
         }
     };
 
-    const onSubmit = async () => {
+    const navigate = useNavigate();
+    const handleSubmit = async () => {
         const data = {
             userLocation: location,
             sunnyGenres: sunnySelectedGenres,
@@ -242,6 +244,7 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
             console.error("Error saving ", error);
             alert("Error connecting to the server");
         }
+        navigate('../main');
     }
 
     const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -298,7 +301,7 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
             <h1>Musical Preferences</h1>
             
             <div className="outline">
-                <form onSubmit={onSubmit}>                       
+                <form onSubmit={handleSubmit}>                       
                     {/* Sunny day preference */}
                     
                     <div className='container' onBlur={handleBlur}>
@@ -638,7 +641,7 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
                     </div>
                 </form>
             </div>
-            <button className='pref-submit-btn' type="submit" onClick={onSubmit}>Save</button>
+            <button className='pref-submit-btn' type="submit" onClick={handleSubmit}>Save</button>
         </>
     );
 };
