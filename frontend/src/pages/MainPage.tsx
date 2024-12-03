@@ -67,9 +67,11 @@ const MainPage: React.FC = () => {
     useEffect(() => {
         // CORA: Fetch Spotify playlist based on weather
         const fetchPlaylist = async (weather: Weather) => {
+            console.log("Inside fetch playlist");
+
             try {
                 const response = await axios.post('http://localhost:5000/api/playlist', {
-                    userId: "USER_ID", // Replace with actual user ID
+                    userId: localStorage.getItem("user_id"),
                     // lat: weather.lat, // Assuming weather API returns lat/lon
                     // lon: weather.lon,
                     weatherCondition: weather.condition,
@@ -84,7 +86,7 @@ const MainPage: React.FC = () => {
             try {
                 // TODO: GET WEATHER FROM API (JOANNE)
 
-                var locationStr = localStorage.getItem("user_location") ?? "NO LOCATION"; // TODO: Add support for no location
+                var locationStr = localStorage.getItem("user_location") ?? "Orlando, Florida"; // Default is Orlando
 
                 // Process location string
                 // We are going to be compatible with three different options:
@@ -132,16 +134,22 @@ const MainPage: React.FC = () => {
                         },
                     });
 
-                    const weather_condition = weatherResponse.data.weather[0].main;
+                    let weather_condition = weatherResponse.data.weather[0].main;
                     const atmosphere_list = ["Mist", "Smoke", "Haze", "Dust", "Fog", "Sand", "Dust", "Ash", "Squall", "Tornado"];
 
-                    if (weather_condition == 'Drizzle'){
-                        weather_condition == 'Rain';
-                    } else if (atmosphere_list.includes(weather_condition)){
-                        weather_condition == 'Clouds';
+                    if (weather_condition == 'Drizzle' || weather_condition == 'Thunderstorm' || weather_condition == 'Rain'){
+                        weather_condition = 'rainy';
+                    } else if (weather_condition == 'Snow') {
+                        weather_condition = 'snowy';
+                    } else if (weather_condition == 'Clouds' || atmosphere_list.includes(weather_condition)){
+                        weather_condition = 'cloudy';
+                    } else if (weather_condition == 'Clear') {
+                        weather_condition = 'sunny';
                     }
 
-                    const api_weather = {condition: weather_condition, location: cityName, temp: weatherResponse.data.main.temp};
+                    console.log("Weather in ", cityName, " is ", weather_condition);
+
+                    const api_weather = {condition: weather_condition, location: cityName, temp: weatherResponse.data.main.temp, lat:lat, lon:lon};
                     setWeather(api_weather);
                     fetchPlaylist(api_weather);
                 }

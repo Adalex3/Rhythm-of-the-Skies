@@ -390,13 +390,15 @@ app.get('/api/getPreference', async (req, res, next) => {
 
     userId = userId ? new ObjectId(String(userId)) : '';
 
+    console.log("Input weather condition", weatherCondition);
+
     const weatherResponse = await axios.get('http://localhost:5000/api/getWeatherCondition', {
         params : {
             weatherName:weatherCondition,
         },
     });
 
-    // console.log(weatherResponse.data);
+    console.log(weatherResponse.data);
 
     let weatherId = new ObjectId(String(weatherResponse.data));
     // console.log("weatherId gained from search: ", weatherId);
@@ -415,14 +417,15 @@ app.get('/api/getPreference', async (req, res, next) => {
         );
 
         // console.log("weatherId: ", weatherId);
-        // console.log(result);
+        console.log("Result of weather search:");
+        console.log(result);
 
         if (result) {
             console.log('Successfully got preferences');
 
             let genreArray = result.associatedGenres;
 
-            // console.log(genreArray);
+            console.log(genreArray);
 
             let genreNames = [];
 
@@ -433,12 +436,12 @@ app.get('/api/getPreference', async (req, res, next) => {
                     },
                 });
 
-                let genreName = genreResponse.data.genreName;
+                let genreName = genreResponse.data;
 
                 genreNames.push(genreName);
             }
 
-            // console.log(genreNames);
+            console.log("Return value: ", genreNames);
             res.status(200).json(genreNames);
         } else { 
             console.log('Did not get preferences');
@@ -536,13 +539,28 @@ app.get('/api/getWeatherCondition', async (req, res, next) => {
 
     let { weatherName } = req.query;
 
-    console.log("inside getWeatherCondition");
-    console.log(weatherName);
+    // console.log("inside getWeatherCondition");
+    // console.log("Before Conversion", weatherName);
 
     // weatherName = weatherName ? String(weatherName).trim() : '';
 
     // console.log("Searching id of: ", weatherName);
 
+    // if statement to string together weather api response to database names
+
+    const atmosphere_list = ["Mist", "Smoke", "Haze", "Dust", "Fog", "Sand", "Dust", "Ash", "Squall", "Tornado"];
+
+    if (weatherName == 'Drizzle' || weatherName == 'Thunderstorm' || weatherName == 'Rain'){
+        weatherName = 'rainy';
+    } else if (weatherName == 'Snow') {
+        weatherName = 'snowy';
+    } else if (weatherName == 'Clouds' || atmosphere_list.includes(weatherName)){
+        weatherName = 'cloudy';
+    } else if (weatherName == 'Clear') {
+        weatherName = 'sunny';
+    }
+
+    // console.log("After Conversion", weatherName);
 
     const db = client.db();
 
@@ -612,7 +630,7 @@ app.get('/api/getGenreName', async (req, res, next) => {
 
     genreId = genreId ? new ObjectId(String(genreId)) : '';
 
-    // console.log(`Genre Id: ${genreId}`);
+    console.log(`Genre Id: ${genreId}`);
 
 
 
@@ -621,16 +639,16 @@ app.get('/api/getGenreName', async (req, res, next) => {
     const result = await db.collection('Genre')
                     .findOne({ "_id": genreId});
 
-    // console.log(result);
+    console.log("Result: ", result);
 
     if (result) {
-        var ret = { genreName:result.genre_name, error:error };
-        console.log(ret);
-        res.status(200).json(ret);
+        // var ret = { genreName:, error:error };
+        // console.log(ret);
+        res.status(200).json(result.genre_id);
     } else {
-        error = '_id of genre is null';
-        var ret = { genreName:result, error:error };
-        res.status(404).json(ret)
+        // error = '_id of genre is null';
+        // var ret = { genreName:result, error:error };
+        res.status(404).json('')
     }
 });
 
@@ -709,8 +727,12 @@ app.post('/api/playlist', async (req, res) => {
                         userId:userId,
                     },
                 });
+
+                console.log("User info from database:", user.data);
                 
-                let spotifyToken = user.spotifyAccessToken;
+                let spotifyToken = user.data.spotifyAccessToken;
+
+                console.log("spotifyToken: ", spotifyToken);
 
                 if (!spotifyToken) {
                     return res.status(401).send('Spotify token missing or invalid. Please reauthenticate.'); // Check for valid Spotify token
@@ -723,6 +745,9 @@ app.post('/api/playlist', async (req, res) => {
                         limit: 20,
                     },
                 });
+
+                console.log("Spotify Response:");
+                console.log(spotifyResponse.data);
 
                 const tracks = spotifyResponse.data.tracks; // Fetch recommended tracks
                 const trackUris = tracks.map((track) => track.uri); // Extract track URIs

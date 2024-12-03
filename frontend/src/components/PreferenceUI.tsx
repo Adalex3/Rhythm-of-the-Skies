@@ -152,6 +152,7 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
                 let wC = weatherConditions[i]
                 
                 console.log("Currently on: ", wC);
+                console.log(weatherGenres[i]);
 
 
                 let check_exist = await axios.get('http://localhost:5000/api/getPreference', {
@@ -161,15 +162,18 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
                     },
                 })
 
-                // console.log("Just checked for existence");
+                
 
                 let exists = false;
 
-                if (check_exist.data) {
+                if (check_exist.data != false) {
                     exists = true;
                 }
 
-                if (exists && check_exist.data.length > 0) {
+                console.log("Existence: ", exists);
+                console.log("Weather genre list: ", weatherGenres[i].length);
+
+                if (exists && weatherGenres[i].length > 0) {
                     console.log(wC, " exists and we update");
                     // Update if exists and new preference is a list of genres
                     try {
@@ -190,7 +194,7 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
                         console.log("Update unsuccessful for ", wC);
                         alert(error);
                     }
-                } else if ((!exists) && check_exist.data.length > 0) {
+                } else if ((!exists) && weatherGenres[i].length > 0) {
                     console.log(wC," does not exist and we add");
                     // Add if entry does not exist and new preference is a list with genres
                     try {
@@ -212,7 +216,7 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
                         console.log("Add unsuccessful for ", wC);
                         alert(error);
                     }
-                } else if (exists && check_exist.data.length == 0) {
+                } else if (exists && weatherGenres[i].length == 0) {
                     // Delete if the entry exists but the newPreference has no genres
                     console.log(wC," exists and we delete");
 
