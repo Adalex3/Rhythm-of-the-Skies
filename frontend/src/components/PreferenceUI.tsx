@@ -265,8 +265,14 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
             localStorage.setItem("user_location",textFieldStr);
 
             setLocationDisplay(textFieldStr);
+            document.querySelector(".location-gen-search")?.classList.toggle("angry",false);
+            document.querySelector(".example-text")!.textContent = "";
+            document.querySelector(".example-text")!.setAttribute("style","color: black");
+            setLocationSearchTerm("");
         } else {
-            
+            document.querySelector(".location-gen-search")?.classList.toggle("angry",true);
+            document.querySelector(".example-text")!.textContent = "Invalid Location";
+            document.querySelector(".example-text")!.setAttribute("style","color: red");
         }
     };
 

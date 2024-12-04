@@ -504,3 +504,7 @@ locationSearchHead {
 .example-text {
   color:#2D2A3A;
 }
+
+.angry {
+  box-shadow: 0px 0px 15px red;
+}
