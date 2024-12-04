@@ -500,3 +500,7 @@ locationSearchHead {
   display: block; 
   margin-top: 20px;
 }
+
+.example-text {
+  color:#2D2A3A;
+}

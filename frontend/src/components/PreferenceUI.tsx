@@ -259,11 +259,15 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
         event.preventDefault();
         console.log('Enter pressed:', locationSearchTerm);
 
-        // Set the localStorage location to be the search field value
-        const textFieldStr = locationSearchTerm;
-        localStorage.setItem("user_location",textFieldStr);
+        if(locationSearchTerm != "") {
+            // Set the localStorage location to be the search field value
+            const textFieldStr = locationSearchTerm;
+            localStorage.setItem("user_location",textFieldStr);
 
-        setLocationDisplay(textFieldStr);
+            setLocationDisplay(textFieldStr);
+        } else {
+            
+        }
     };
 
     return (
@@ -296,10 +300,11 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
                                 onChange={handleLocationChange}
                             />
 
+                            <p className='example-text'>Ex: Orlando, FL</p>
+
                         </div>
                     </div>
                 </form>
-               
             </div>
 
             <h1>Musical Preferences</h1>
