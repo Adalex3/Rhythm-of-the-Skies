@@ -9,12 +9,9 @@ import preferences_rainbow from '../images/preferences_rainbow.png'
 import { LocationContext } from '../pages/PreferencesPage';
 import { useNavigate } from 'react-router-dom';
 
-// Alex TO-DO: how do you edit this to communicate with
-// your main page so the user's location selection here
-// reflects on main?
 interface PreferencesProps {
     location: string;
-  }
+}
 
 const genres = [
     "acoustic", "afrobeat", "alt-rock", "alternative", "ambient", "anime",
@@ -313,7 +310,7 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
                 </form>
             </div>
 
-            <h1>Musical Preferences</h1>
+            <h1 className='musical-packages'>Musical Preferences</h1>
             
             <div className="outline">
                 <form onSubmit={handleSubmit}>                       
