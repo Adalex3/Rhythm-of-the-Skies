@@ -12,7 +12,7 @@ function Login() {
         // const spotify_id = '67412fc6e0c5e59a30c1e534'; // temp value, replace with USER ID
 
 
-        const spotify_id = '674fb1dd8a3a97bbd4650df8'; //Joanne's spotify id
+        const spotify_id = '67512a2f0dabe1794273c339'; //Joanne's spotify id
         // Once Spotify is logged in...
         localStorage.setItem("user_id",String(spotify_id));
 

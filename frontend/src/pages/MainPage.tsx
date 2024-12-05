@@ -273,7 +273,7 @@ const MainPage: React.FC = () => {
             ) : (
               <p>Loading playlist...</p>
             )}
-            <ProfileDisplay username="Alex Hynds" />
+            <ProfileDisplay username="JJWang" />
           </div>
         </div>
       );
