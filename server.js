@@ -144,6 +144,7 @@ app.get('/login', (req, res) => {
 });
 
 // Spotify Callback Route
+// Spotify Callback Route
 app.get('/callback', async (req, res) => {
     const code = req.query.code;
 
@@ -157,10 +158,14 @@ app.get('/callback', async (req, res) => {
         const accessToken = data.body['access_token'];
         const refreshToken = data.body['refresh_token'];
 
+        // Set the access token and refresh token
         spotifyApi.setAccessToken(accessToken);
         spotifyApi.setRefreshToken(refreshToken);
 
+        // Check if the access token is valid by making a simple request to Spotify's "me" endpoint
         const userInfo = await spotifyApi.getMe();
+
+        // If we successfully get user info, the access token is valid
         const spotifyId = userInfo.body.id;
         const displayName = userInfo.body.display_name;
         const email = userInfo.body.email;
@@ -197,13 +202,21 @@ app.get('/callback', async (req, res) => {
             console.log('New user added to MongoDB:', spotifyId);
         }
 
-        // res.send('Spotify authentication successful. User info saved!');
+        // Redirect the user to the preferences page
         res.redirect('http://localhost:5173/preferences');
     } catch (error) {
         console.error('Error during Spotify authentication:', error);
-        res.status(500).send('Error during Spotify authentication');
+
+        // Check if the error is due to an invalid access token
+        if (error.body && error.body.error && error.body.error.status === 401) {
+            console.error('Invalid access token');
+            res.status(401).send('Invalid access token');
+        } else {
+            res.status(500).send('Error during Spotify authentication');
+        }
     }
 });
+
 
 
 
