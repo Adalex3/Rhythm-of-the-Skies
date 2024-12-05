@@ -68,15 +68,19 @@ const MainPage: React.FC = () => {
         // CORA: Fetch Spotify playlist based on weather
         const fetchPlaylist = async (weather: Weather) => {
             console.log("Inside fetch playlist");
-
+        
             try {
-                const response = await axios.post('http://localhost:5000/api/playlist', {
-                    userId: localStorage.getItem("user_id"),
-                    // lat: weather.lat, // Assuming weather API returns lat/lon
-                    // lon: weather.lon,
+                const response = await axios.post<Playlist>('http://localhost:5000/api/playlist', {
+                    userId: localStorage.getItem("user_id") as string,
                     weatherCondition: weather.condition,
                 });
-                setPlaylist(response.data); // CORA: Update state with playlist data from backend.
+        
+                const playlistData = response.data;
+        
+                // Convert date string to Date object
+                playlistData.date = new Date(playlistData.date);
+        
+                setPlaylist(playlistData);
             } catch (error) {
                 console.error("Error fetching Spotify playlist:", error);
             }

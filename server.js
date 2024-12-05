@@ -674,11 +674,10 @@ app.get('/api/getUser', async (req, res, next) => {
     }
 });
 
-// CORA: Spotify playlist generation
+
 app.post('/api/playlist', async (req, res) => {
-    // const { userId, lat, lon , weatherCondition} = req.body; // New endpoint for generating Spotify playlists
-    const { userId, weatherCondition} = req.body; // New endpoint for generating Spotify playlists
-    
+    const { userId, weatherCondition } = req.body;
+
     try {
         // Fetch weather data for the user's location
         // const weatherResponse = await axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&appid=${process.env.OPENWEATHERMAP_API_KEY}`);
@@ -699,108 +698,115 @@ app.post('/api/playlist', async (req, res) => {
         //     if (genre) genreNames.push(genre.genre_name);
         // }
 
-
-
         // Retrieve user preferences for the current weather condition
+        const response = await axios.get('http://localhost:5000/api/getPreference', {
+            params: {
+                userId: userId,
+                weatherCondition: weatherCondition,
+            },
+        });
 
-        try {
-            // getPreference handles getting the genre ids returns an array of the corresponding names of those genres
-            const response = await axios.get('http://localhost:5000/api/getPreference', {
-                params:{
-                    userId:userId,
-                    weatherCondition:weatherCondition,
-                },
-            });
+        const genreNames = response.data;
 
-            const genreNames = response.data;
-
-            if (genreNames.length === 0) {
-                return res.status(404).send('No genres associated with the current weather condition.'); // Return if no genres found
-            }
-
-            // Generate Spotify playlist using user's preferences
-            // const user = await db.collection('User').findOne({ _id: new ObjectId(userId) }); // Retrieve user data for Spotify integration
-            
-            try {
-                const user = await axios.get('http://localhost:5000/api/getUser', {
-                    params:{
-                        userId:userId,
-                    },
-                });
-
-                console.log("User info from database:", user.data);
-                
-                let spotifyToken = user.data.spotifyAccessToken;
-
-                console.log("spotifyToken: ", spotifyToken);
-
-                if (!spotifyToken) {
-                    return res.status(401).send('Spotify token missing or invalid. Please reauthenticate.'); // Check for valid Spotify token
-                }
-
-                const spotifyResponse = await axios.get('https://api.spotify.com/v1/recommendations', {
-                    headers: { Authorization: `Bearer ${spotifyToken}` },
-                    params: {
-                        seed_genres: genreNames.join(','), // Use genres as seed parameters
-                        limit: 20,
-                    },
-                });
-
-                console.log("Spotify Response:");
-                console.log(spotifyResponse.data);
-
-                const tracks = spotifyResponse.data.tracks; // Fetch recommended tracks
-                const trackUris = tracks.map((track) => track.uri); // Extract track URIs
-
-                // Create a Spotify playlist
-                const playlistResponse = await axios.post(
-                    `https://api.spotify.com/v1/users/${user.spotifyId}/playlists`,
-                    {
-                        name: `Weather-based Playlist (${weatherCondition})`,
-                        description: `A playlist based on the current weather: ${weatherCondition}`, // Playlist description includes weather condition
-                        public: false,
-                    },
-                    {
-                        headers: { Authorization: `Bearer ${spotifyToken}` },
-                    }
-                );
-
-                const playlistId = playlistResponse.data.id; // Get created playlist ID
-
-                // Add tracks to the playlist
-                await axios.post(
-                    `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
-                    { uris: trackUris }, // Add recommended tracks to the playlist
-                    { headers: { Authorization: `Bearer ${spotifyToken}` } }
-                );
-
-                // Save playlist to database
-                const playlistDbEntry = {
-                    user_id: userId,
-                    genres: genreIds, // Genres associated with the playlist
-                    weatherConditions: weatherCondition, // Weather condition associated with the playlist
-                    songs: tracks.map((track) => ({
-                        track_id: track.id,
-                        track_name: track.name,
-                        artist_name: track.artists[0].name, // Save song metadata
-                    })),
-                    date: new Date(), // Timestamp of playlist creation
-                };
-
-                const result = await db.collection('Playlist').insertOne(playlistDbEntry); // Save playlist data to Playlist collection
-
-                res.json({ success: true, playlistId, dbId: result.insertedId }); // Respond with success and playlist details
-            } catch (error) {
-                return res.status(404).send('No user with userId found'); 
-            }
-        } catch (error) {
-            return res.status(404).send('No preferences found for the current weather condition.'); // Return if no preferences are set for the weather condition
+        if (genreNames.length === 0) {
+            return res.status(404).send('No genres associated with the current weather condition.');
         }
+
+        // Retrieve user data
+        const userResponse = await axios.get('http://localhost:5000/api/getUser', {
+            params: {
+                userId: userId,
+            },
+        });
+
+        const user = userResponse.data;
+        const spotifyToken = user.spotifyAccessToken;
+
+        if (!spotifyToken) {
+            return res.status(401).send('Spotify token missing or invalid. Please reauthenticate.');
+        }
+
+        // Generate Spotify playlist using user's preferences
+        const spotifyResponse = await axios.get('https://api.spotify.com/v1/recommendations', {
+            headers: { Authorization: `Bearer ${spotifyToken}` },
+            params: {
+                seed_genres: genreNames.join(','),
+                limit: 20,
+            },
+        });
+
+        const tracks = spotifyResponse.data.tracks;
+
+        // Map the tracks to the Song interface
+        const songs = tracks.map((track) => ({
+            id: track.id,
+            track_id: track.id,
+            track_name: track.name,
+            artist_name: track.artists[0].name,
+            artist_id: track.artists[0].id,
+            album_name: track.album.name,
+            album_id: track.album.id,
+            album_image_url: track.album.images[0]?.url || '',
+            track_url: track.external_urls.spotify,
+            duration: track.duration_ms,
+        }));
+
+        // Create a Spotify playlist
+        const playlistResponse = await axios.post(
+            `https://api.spotify.com/v1/users/${user.spotifyId}/playlists`,
+            {
+                name: `Weather-based Playlist (${weatherCondition})`,
+                description: `A playlist based on the current weather: ${weatherCondition}`,
+                public: false,
+            },
+            {
+                headers: { Authorization: `Bearer ${spotifyToken}` },
+            }
+        );
+
+        const spotify_url = playlistResponse.data.external_urls.spotify;
+        const playlistId = playlistResponse.data.id;
+
+        // Add tracks to the Spotify playlist
+        const trackUris = tracks.map((track) => track.uri);
+        await axios.post(
+            `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+            { uris: trackUris },
+            { headers: { Authorization: `Bearer ${spotifyToken}` } }
+        );
+
+        // Prepare the playlist data
+        const playlistDbEntry = {
+            user_id: userId,
+            genres: genreNames,
+            weatherConditions: [weatherCondition],
+            songs: songs,
+            date: new Date(),
+            spotify_url: spotify_url,
+        };
+
+        // Save the playlist to the database
+        const result = await db.collection('Playlist').insertOne(playlistDbEntry);
+
+        // Construct the Playlist object for the response
+        const playlist = {
+            id: result.insertedId.toString(),
+            user_id: userId,
+            genres: genreNames,
+            weatherConditions: [weatherCondition],
+            songs: songs,
+            date: new Date(),
+            spotify_url: spotify_url,
+        };
+
+        // Send the Playlist object as the response
+        res.json(playlist);
     } catch (error) {
-        console.error('Error generating Spotify playlist:', error.message); // Log errors
-        res.status(500).send('Error generating Spotify playlist'); // Send error response
+        console.error('Error generating Spotify playlist:', error.message);
+        res.status(500).send('Error generating Spotify playlist');
     }
 });
+
 
 app.listen(5000, () => {
     console.log('Server running on http://localhost:5000');
