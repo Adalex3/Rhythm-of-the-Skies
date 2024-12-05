@@ -907,6 +907,8 @@ app.post('/api/playlist', async (req, res) => {
             
         const atmosphere_list = ["Mist", "Smoke", "Haze", "Dust", "Fog", "Sand", "Dust", "Ash", "Squall", "Tornado"];
 
+        console.log("Line 903");
+
         if (weatherCondition == 'Drizzle' || weatherCondition == 'Thunderstorm' || weatherCondition == 'Rain'){
             weatherCondition = 'rainy';
         } else if (weatherCondition == 'Snow') {
@@ -917,13 +919,17 @@ app.post('/api/playlist', async (req, res) => {
             weatherCondition = 'sunny';
         }
 
+        console.log("Line 915");
+
+
         console.log("After Conversion", weatherCondition);
 
-
+        console.log("Line 920");
 
         // Retrieve user preferences for the current weather condition
 
         try {
+            console.log("Line 925");
             // getPreference handles getting the genre ids returns an array of the corresponding names of those genres
             const response = await axios.get('http://localhost:5000/api/getPreference', {
                 params:{
@@ -932,18 +938,26 @@ app.post('/api/playlist', async (req, res) => {
                 },
             });
 
+            console.log("Line 934");
+
             console.log("Just got preference in playlist api: ", response.data);
 
             const genreNames = response.data;
 
+            console.log("Line 940");
+
             if (genreNames.length === 0) {
+                console.log("Line 943");
                 return res.status(404).send('No genres associated with the current weather condition.'); // Return if no genres found
             }
+
+            console.log("Line 947");
 
             // Generate Spotify playlist using user's preferences
             // const user = await db.collection('User').findOne({ _id: new ObjectId(userId) }); // Retrieve user data for Spotify integration
             
             try {
+                console.log("Line 953");
                 console.log("Now trying to get user...");
                 const user = await axios.get('http://localhost:5000/api/getUser', {
                     params:{
@@ -951,12 +965,17 @@ app.post('/api/playlist', async (req, res) => {
                     },
                 });
 
+                console.log("Line 961");
+
                 // console.log("Result from getUser: ", user.data);
 
                 try {
+                    console.log("Line 966");
                     let refreshToken = user.data.spotifyRefreshToken;
                     let clientId = process.env.SPOTIFY_CLIENT_ID;
                     let clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+
+                    console.log("Line 971");
 
                     console.log("Refresh Token:", refreshToken);
                     console.log("ClientId: ", clientId);
@@ -966,7 +985,9 @@ app.post('/api/playlist', async (req, res) => {
 
                     // New technique to keep getting new access tokens - Joanne
                     try {
+                        console.log("Line 981");
                         const base64Credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+                        console.log("Line 983");
                         console.log('Base64 Encoded Credentials:', base64Credentials);
                         const tokenResponse = await axios.post('https://accounts.spotify.com/api/token', new URLSearchParams({
                             grant_type: 'refresh_token',  // Correct grant_type
@@ -977,21 +998,30 @@ app.post('/api/playlist', async (req, res) => {
                                 'Content-Type': 'application/x-www-form-urlencoded' // Ensure content type is correctly set
                             }
                         });
+                        console.log("Line 994");
                         console.log('Token response:', tokenResponse.data);  // Inspect the response
                     
                         const spotifyToken = tokenResponse.data.access_token;
 
+                        console.log("Line 999");
+
                         console.log("New Access Token:", spotifyToken);
 
                         if (!spotifyToken) {
+                            console.log("Line 1004");
                             console.log("!spotifyToken triggered");
                             return res.status(401).send('Spotify token missing or invalid. Please reauthenticate.'); // Check for valid Spotify token
                         }
 
+                        console.log("Line 1009");
+
                         console.log("About to make spotify API call...");
                         console.log("GENRENAMES::", genreNames);
                         console.log("seed_genres: ", genreNames.join(','));
+
+                        console.log("Line 1014");
                         try {
+                            console.log("Line 1016");
                             const spotifyResponse = await axios.get('https://api.spotify.com/v1/recommendations', {
                                 headers: { Authorization: `Bearer ${spotifyToken}` },
                                 params: {
@@ -1000,12 +1030,19 @@ app.post('/api/playlist', async (req, res) => {
                                 },
                             });
 
+                            console.log("Line 1025");
+
 
                             console.log("Spotify Response:");
                             console.log(spotifyResponse.data);
 
+                            console.log("Line 1031");
+
                             const tracks = spotifyResponse.data.tracks; // Fetch recommended tracks
+                            console.log("Line 1034");
                             const trackUris = tracks.map((track) => track.uri); // Extract track URIs
+
+                            console.log("Line 1037");
 
                             // Create a Spotify playlist
                             const playlistResponse = await axios.post(
@@ -1019,16 +1056,21 @@ app.post('/api/playlist', async (req, res) => {
                                     headers: { Authorization: `Bearer ${spotifyToken}` },
                                 }
                             );
+                            console.log("Line 1051");
 
                             const playlistId = playlistResponse.data.id; // Get created playlist ID
 
+                            console.log("Line 1055");
+
                             try {
+                                console.log("Line 1058");
                                 // Add tracks to the playlist
                                 await axios.post(
                                     `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
                                     { uris: trackUris }, // Add recommended tracks to the playlist
                                     { headers: { Authorization: `Bearer ${spotifyToken}` } }
                                 );
+                                console.log("Line 1065");
 
                                 // Save playlist to database
                                 const playlistDbEntry = {
@@ -1043,65 +1085,100 @@ app.post('/api/playlist', async (req, res) => {
                                     date: new Date(), // Timestamp of playlist creation
                                 };
 
+                                console.log("Line 1080");
+
                                 const result = await db.collection('Playlist').insertOne(playlistDbEntry); // Save playlist data to Playlist collection
 
+                                console.log("Line 1084");
+
                                 res.json({ success: true, playlistId, dbId: result.insertedId }); // Respond with success and playlist details
+
+                                console.log("Line 1088");
                             } catch(err) {
+                                console.log("Line 1090");
                                 return res.status(404).send('Error adding tracks to playlist'); 
                             }
+
+                            console.log("Line 1094");
                         
                             // Process the successful response here (e.g., display the recommendations)
                         } catch (error) {
+
+                            console.log("Line 1099");
                             // Display the error message
                             if (error.response) {
+                                console.log("Line 1102");
                                 // If the server responded with a status other than 2xx
                                 console.log('Error Response:', error.response);
                                 console.log('Status:', error.response.status);
                                 console.log('Headers:', error.response.headers);
+
+                                console.log("Line 1108");
                                 
                                 // Safely access error message
                                 if (error.response.data && error.response.data.error && error.response.data.error.message) {
+                                    console.log("Line 1112");
                                     console.log(`Error: ${error.response.data.error.message}`);
                                 } else {
+                                    console.log("Line 1115");
                                     console.log('Error: Unexpected response structure or missing message.');
                                 }
                             } else if (error.request) {
+                                console.log("Line 1119");
                                 // If no response was received
                                 console.log('Error Request:', error.request);
                                 console.log('Error: No response received from the server.');
+                                console.log("Line 1123");
                             } else {
+                                console.log("Line 1125");
                                 // If an error occurred while setting up the request
                                 console.log('Error Message:', error.message);
                                 console.log(`Error: ${error.message}`);
                             }
                         }
                         
-                        
+                        console.log("Line 1132");
 
                         
 
                     } catch (error) {
+                        console.log("Line 1137");
                         if (error.response && error.response.data.error === 'invalid_grant') {
+                            console.log("Line 1139");
                             console.error('Refresh token has expired or is invalid.');
                             // You may need to request the user to authenticate again
                         } else {
+                            console.log("Line 1143");
                             console.error('Error refreshing token:', error.response ? error.response.data : error.message);
-                        }                    }
+                        }                   
+                    
+                    }
+
+                    console.log("Line 1149");
 
                 } catch(err) {
+                    console.log("Line 1152");
                     return res.status(404).send('Playlist Response from Spotify error'); 
                 }
+
+                console.log("Line 1156");
                 
                 
             } catch (error) {
+                console.log("Line 1160");
                 return res.status(404).send('No user with userId found'); 
             }
+            console.log("Line 1163");
         } catch (error) {
+            console.log("Line 1165");
             return res.status(404).send('No preferences found for the current weather condition.'); // Return if no preferences are set for the weather condition
         }
+        console.log("Line 1168");
     } catch (error) {
+        console.log("Line 1170");
         console.error('Error generating Spotify playlist:', error.message); // Log errors
         res.status(500).send('Error generating Spotify playlist'); // Send error response
+        console.log("Line 1173");
     }
 });
 
