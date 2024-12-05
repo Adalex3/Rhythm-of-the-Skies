@@ -138,7 +138,12 @@ app.use(bodyParser.json());
 
 // Spotify Login Route
 app.get('/login', (req, res) => {
-    const scopes = ['user-read-private', 'user-read-email'];
+    const scopes = [
+        'user-read-private',
+        'user-read-email',
+        'playlist-modify-private',
+        'playlist-modify-public'
+    ];
     const authorizeURL = spotifyApi.createAuthorizeURL(scopes);
     res.redirect(authorizeURL);
 });
@@ -165,6 +170,7 @@ app.get('/callback', async (req, res) => {
 
         // Check if the access token is valid by making a simple request to Spotify's "me" endpoint
         const userInfo = await spotifyApi.getMe();
+        console.log("USERINFO: ", userInfo);
 
         // If we successfully get user info, the access token is valid
         const spotifyId = userInfo.body.id;
@@ -210,6 +216,7 @@ app.get('/callback', async (req, res) => {
 
         // Check if the error is from Spotify API
         if (error.body && error.body.error) {
+            console.log("ERROR FROM SPOTIFY API:");
             const errorCode = error.body.error.status; // 401 for unauthorized, etc.
             const errorMessage = error.body.error.message; // Detailed error message
             console.error(`Spotify API error: ${errorMessage} (Code: ${errorCode})`);
@@ -565,7 +572,7 @@ app.get('/api/getPreference', async (req, res, next) => {
 
     console.log("Inside getPreference");
 
-    console.log(req);
+    // console.log(req);
 
     // Gets the list of genres when given weather name
     let { userId, weatherCondition } = req.query;
@@ -982,6 +989,7 @@ app.post('/api/playlist', async (req, res) => {
                         }
 
                         console.log("About to make spotify API call...");
+                        console.log("GENRENAMES::", genreNames);
                         console.log("seed_genres: ", genreNames.join(','));
                         try {
                             const spotifyResponse = await axios.get('https://api.spotify.com/v1/recommendations', {
@@ -1047,7 +1055,7 @@ app.post('/api/playlist', async (req, res) => {
                             // Display the error message
                             if (error.response) {
                                 // If the server responded with a status other than 2xx
-                                console.log('Error Response:', error.response.data);
+                                console.log('Error Response:', error.response);
                                 console.log('Status:', error.response.status);
                                 console.log('Headers:', error.response.headers);
                                 
