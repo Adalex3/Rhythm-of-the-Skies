@@ -145,6 +145,7 @@ app.get('/login', (req, res) => {
 
 // Spotify Callback Route
 // Spotify Callback Route
+// Spotify Callback Route
 app.get('/callback', async (req, res) => {
     const code = req.query.code;
 
@@ -207,15 +208,26 @@ app.get('/callback', async (req, res) => {
     } catch (error) {
         console.error('Error during Spotify authentication:', error);
 
-        // Check if the error is due to an invalid access token
-        if (error.body && error.body.error && error.body.error.status === 401) {
-            console.error('Invalid access token');
-            res.status(401).send('Invalid access token');
+        // Check if the error is from Spotify API
+        if (error.body && error.body.error) {
+            const errorCode = error.body.error.status; // 401 for unauthorized, etc.
+            const errorMessage = error.body.error.message; // Detailed error message
+            console.error(`Spotify API error: ${errorMessage} (Code: ${errorCode})`);
+
+            // Send a more specific error response
+            if (errorCode === 401) {
+                res.status(401).send(`Invalid access token: ${errorMessage}`);
+            } else {
+                res.status(500).send(`Spotify authentication error: ${errorMessage}`);
+            }
         } else {
+            // For other types of errors (e.g., network errors)
+            console.error('Unknown error during authentication', error);
             res.status(500).send('Error during Spotify authentication');
         }
     }
 });
+
 
 
 
