@@ -7,7 +7,8 @@ interface ProfileDisplayProps {
 
 function doLogout(event: any): void {
   event.preventDefault();
-  location.href = '/'
+  location.href = '/';
+  localStorage.setItem("user_id","");
 };
 
 const ProfileDisplay: React.FC<ProfileDisplayProps> = ({ username }) => {
