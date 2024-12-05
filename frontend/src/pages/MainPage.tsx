@@ -135,17 +135,17 @@ const MainPage: React.FC = () => {
                     });
 
                     let weather_condition = weatherResponse.data.weather[0].main;
-                    const atmosphere_list = ["Mist", "Smoke", "Haze", "Dust", "Fog", "Sand", "Dust", "Ash", "Squall", "Tornado"];
+                    // const atmosphere_list = ["Mist", "Smoke", "Haze", "Dust", "Fog", "Sand", "Dust", "Ash", "Squall", "Tornado"];
 
-                    if (weather_condition == 'Drizzle' || weather_condition == 'Thunderstorm' || weather_condition == 'Rain'){
-                        weather_condition = 'rainy';
-                    } else if (weather_condition == 'Snow') {
-                        weather_condition = 'snowy';
-                    } else if (weather_condition == 'Clouds' || atmosphere_list.includes(weather_condition)){
-                        weather_condition = 'cloudy';
-                    } else if (weather_condition == 'Clear') {
-                        weather_condition = 'sunny';
-                    }
+                    // if (weather_condition == 'Drizzle' || weather_condition == 'Thunderstorm' || weather_condition == 'Rain'){
+                    //     weather_condition = 'rainy';
+                    // } else if (weather_condition == 'Snow') {
+                    //     weather_condition = 'snowy';
+                    // } else if (weather_condition == 'Clouds' || atmosphere_list.includes(weather_condition)){
+                    //     weather_condition = 'cloudy';
+                    // } else if (weather_condition == 'Clear') {
+                    //     weather_condition = 'sunny';
+                    // }
 
                     console.log("Weather in ", cityName, " is ", weather_condition);
 

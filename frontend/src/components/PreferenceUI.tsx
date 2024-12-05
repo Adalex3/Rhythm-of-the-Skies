@@ -264,6 +264,7 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
         localStorage.setItem("user_location",textFieldStr);
 
         setLocationDisplay(textFieldStr);
+        setLocationSearchTerm('');
     };
 
     return (
