@@ -8,7 +8,9 @@ function Login() {
         
         // TODO: Ayesha add Spotify API!
         console.log("LOGGING IN WITH SPOTIFY...");
-
+        /* NOAH CHANGES:
+        window.location.href=('https://rhythmoftheskies.xyz/login');
+        */ 
         window.location.href = "http://localhost:5000/login"
     }
     return (

@@ -7,7 +7,17 @@ const cors = require('cors');
 const app = express();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');// const mongoose = require('mongoose');
 const SpotifyWebApi = require('spotify-web-api-node');
-app.use(cors());
+
+/*
+NOAH CHANGES: 
+app.use(cors({
+     origin: 'https://rhythmoftheskies.xyz',  // Update this with your frontend URL
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+   allowedHeaders: ['Content-Type', 'Authorization'],  // Customize as needed
+  }));
+*/
+
+app.use(cors()); 
 app.use(bodyParser.json());
 app.use((req, res, next) => {
 
@@ -33,6 +43,15 @@ app.use((req, res, next) => {
 
 });
 
+/*
+NOAH CHANGES: 
+
+const uri = `mongodb+srv://qidiwang:${process.env.DATABASE_PASSWORD}@cluster0.4asd5.mongodb.net/Rhythm?retryWrites=true&w=majority&appName=Cluster0`
+const client = new MongoClient(uri, {
+    serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true },
+});
+*/
+
 const uri = process.env.MONGODB_URI
 const client = new MongoClient(uri, {
     serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true },
@@ -56,7 +75,11 @@ connectToDatabase();
 const spotifyApi = new SpotifyWebApi({
     clientId: process.env.SPOTIFY_CLIENT_ID,
     clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-    redirectUri: 'http://localhost:5000/callback',
+    /*
+    NOAH CHANGES:
+    redirectUri: 'https://rhythmoftheskies.xyz/callback',
+    */ 
+    redirectUri: 'http://localhost:5000/callback', 
     //redirectUri: 'http://54.89.11.234:5000/callback',
 });
 
@@ -143,6 +166,10 @@ app.get('/callback', async (req, res) => {
         }
 
         // Redirect the user to the preferences page
+        /*
+        NOAH CHANGES:
+        res.redirect('https://rhythmoftheskies.xyz/preferences');
+        */ 
         res.redirect('http://localhost:5173/preferences');
     } catch (error) {
         console.error('Error during Spotify authentication:', error);
