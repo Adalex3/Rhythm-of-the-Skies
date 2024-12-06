@@ -9,14 +9,6 @@ function Login() {
         // TODO: Ayesha add Spotify API!
         console.log("LOGGING IN WITH SPOTIFY...");
 
-        // const spotify_id = '67412fc6e0c5e59a30c1e534'; // temp value, replace with USER ID
-
-
-        const spotify_id = '67512a2f0dabe1794273c339'; //Joanne's spotify id
-        // Once Spotify is logged in...
-        localStorage.setItem("user_id",String(spotify_id));
-
-        // Now we can use localStorage.getItem("user_id") to get it
         window.location.href = "http://localhost:5000/login"
     }
     return (

@@ -37,6 +37,8 @@ const uri = process.env.MONGODB_URI
 const client = new MongoClient(uri, {
     serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true },
 });
+global.spotifyUsername = '';
+global.userId = '';
 
 // Go ahead and connect to the database immediately
 async function connectToDatabase() {
@@ -94,6 +96,8 @@ app.get('/callback', async (req, res) => {
         // Check if the access token is valid by making a simple request to Spotify's "me" endpoint
         const userInfo = await spotifyApi.getMe();
         console.log("Spotify User Info: ", userInfo);
+        // global.spotifyUsername = userInfo.display_name;
+
 
         // If we successfully get user info, the access token is valid
         const spotifyId = userInfo.body.id;
@@ -121,6 +125,8 @@ app.get('/callback', async (req, res) => {
                 }
             );
             console.log('User updated in MongoDB:', spotifyId);
+
+            global.userId = existingUser._id;
         } else {
             const newUser = {
                 spotifyId,
@@ -131,8 +137,9 @@ app.get('/callback', async (req, res) => {
                 preferences: [],
                 registered_at: new Date(),
             };
-            await usersCollection.insertOne(newUser);
+            const add_response = await usersCollection.insertOne(newUser);
             console.log('New user added to MongoDB:', spotifyId);
+            global.userId = add_response.insertedId;
         }
 
         // Redirect the user to the preferences page
@@ -268,6 +275,23 @@ app.get('/api/weather', async (req, res) => {
     } catch (error) {
         console.error('Error fetching weather data:', error); 
         res.status(500).send('Error fetching weather data');
+    }
+});
+
+app.get('/api/getInfoForStorage', async ( req, res ) => {
+    // console.log("Inside get Info for Storage");
+    try {
+        const userInfo = await spotifyApi.getMe();
+        global.spotifyUsername = userInfo.body.display_name;
+        // console.log("Stored Spotify Username:",global.spotifyUsername);
+
+        if (global.spotifyUsername && global.userId) {
+            res.status(200).json({'username':global.spotifyUsername, 'userId':global.userId});
+        } else {
+            res.status(404).json({'username':'', 'userId':''})
+        }
+    } catch (err) {
+        console.log("Could not get info for storage:", err);
     }
 });
 

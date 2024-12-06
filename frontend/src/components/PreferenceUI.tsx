@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // CORA: Added useEffect for fetching Spotify username
 import axios from 'axios';
 import sunny from '../images/pxSunny.png'
 import cloudy from '../images/pxCloudy.png'
@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 // reflects on main?
 interface PreferencesProps {
     location: string;
+    onUpdate: (username: string, userid:string, location: string) => void;
   }
 
 const genres = [
@@ -38,7 +39,7 @@ const genres = [
     "work-out", "world-music"
 ];
 
-const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
+const PreferenceUI: React.FC<PreferencesProps> = ({ location, onUpdate }) => {
     // const [searchTerm, setSearchTerm] = useState("");
     // const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
 
@@ -48,6 +49,8 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
     const [rainySearchTerm, setRainySearchTerm] = useState("");
     const [snowySearchTerm, setSnowySearchTerm] = useState("");
     const [nightSearchTerm, setNightSearchTerm] = useState("");
+    // const [spotifyUsername, setSpotifyUsername] = useState<string | null>(null); // CORA: Added state to store Spotify username
+
 
 
     // Stores genre that user selected into what is initially an empty array(s)
@@ -71,10 +74,44 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
 
     // Location search term
     const [locationSearchTerm, setLocationSearchTerm] = useState("");
-    const [locationDisplay, setLocationDisplay] = useState(location);
+    const [locationDisplay, setLocationDisplay] = useState("");
 
     // Visibility of locations
     const [locationActive, setLocationActive] = useState(false);
+
+    useEffect(() => { // CORA: Fetch Spotify username when the component loads
+        // const storedUsername = localStorage.getItem("spotifyUsername"); // CORA: Fetch username from localStorage
+        // setSpotifyUsername(storedUsername); // CORA: Set username in state
+        fetchUserData();
+    }, []); // CORA: Run this only once when the component mounts
+
+    const fetchUserData = async () => {
+        try {
+          let storage_response = await axios.get('http://localhost:5000/api/getInfoForStorage');
+          const data = await storage_response.data; 
+          
+          if (data.username != '' && data.userId != '') {
+            // Handle the valid data
+            localStorage.setItem("spotifyUsername", data.username);
+            localStorage.setItem("user_id", data.userId);
+            localStorage.setItem("user_location", "Orlando, FL");
+            setLocationDisplay(localStorage.getItem("user_location")!);
+      
+            // Log the stored values to the console
+            console.log('Spotify Username:', localStorage.getItem("spotifyUsername"));
+            console.log('User ID:', localStorage.getItem("user_id"));
+            console.log('User Location:', localStorage.getItem("user_location"));
+
+            onUpdate(data.username, data.userId, localStorage.getItem("user_location")!);
+          } else {
+            console.log('No user data found');
+          }
+        } catch (error) {
+          // Handle any errors that occurred during the fetch
+          console.error('Error fetching data:', error);
+        }
+    };
+      
 
 
     // The behavior of the checkbox list
@@ -141,7 +178,7 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
             // if so, do update
             // if not, then add
 
-            let userId = localStorage.getItem("user_id")
+            let userId = localStorage.getItem("user_id"); // CORA: Fetch user ID from localStorage
             // console.log(userId);
 
             let weatherConditions = ["sunny", "night", "cloudy", "rainy", "snowy"];
@@ -266,6 +303,31 @@ const PreferenceUI: React.FC<PreferencesProps> = ({ location }) => {
         setLocationDisplay(textFieldStr);
         setLocationSearchTerm('');
     };
+
+    // document.addEventListener("DOMContentLoaded", function() {
+    //     // Make a request to your API endpoint after the DOM is loaded
+    //     fetch('/api/getInfoForStorage')
+    //         .then(response => response.json())  // Parse the JSON response
+    //         .then(data => {
+    //             // Handle the data returned from the server
+    //             if (data.username && data.userId) {
+    //                 // console.log('Spotify Username:', data.username);
+    //                 // console.log('User ID:', data.userId);
+    //                 localStorage.setItem("spotifyUsername",data.username);
+    //                 localStorage.setItem("user_id",data.userId);
+    //                 localStorage.setItem("user_location", "Orlando, FL");
+    //                 console.log('Spotify Username:', localStorage.getItem("spotifyUsername"));
+    //                 console.log('User ID:', localStorage.getItem("user_id"));
+    //                 console.log('User Location:', localStorage.getItem("user_location"));
+    //             } else {
+    //                 console.log('No user data found');
+    //             }
+    //         })
+    //         .catch(error => {
+    //             console.error('Error fetching data:', error);
+    //         });
+    // });    
+
 
     return (
         <>
