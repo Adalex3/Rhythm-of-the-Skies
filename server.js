@@ -801,6 +801,9 @@ app.post('/api/playlist', async (req, res) => {
                                 // Process and return the tracks
                                 const tracks = data.tracks.items;
 
+                                // Create an array to hold the song objects
+                                const songs = [];
+
                                 // console.log(tracks);
 
                                 const trackUrls = tracks.map((track) => track.external_urls.spotify);
@@ -829,6 +832,7 @@ app.post('/api/playlist', async (req, res) => {
                                     );
 
                                     const playlistId = playlistResponse.data.id; // Get created playlist ID
+                                    const spotify_url = playlistResponse.data.external_urls.spotify;
 
                                     console.log("Playlist id: ", playlistId);
 
@@ -856,6 +860,8 @@ app.post('/api/playlist', async (req, res) => {
                                                 track_url: item.external_urls.spotify,
                                                 duration: item.duration_ms
                                             };
+
+                                            songs.push(songEntry);
 
                                             // console.log("Song Entry:");
                                             // console.log(songEntry);
@@ -936,7 +942,15 @@ app.post('/api/playlist', async (req, res) => {
                                                     if (playlist_insert_result.acknowledged) {
                                                         console.log('Playlist inserted with id:', playlist_insert_result.insertedId);
                                                         // Process the successful response here (e.g., display the recommendations)
-                                                        res.json({ success: true, playlistId, dbId: playlist_insert_result.insertedId }); // Respond with success and playlist details
+                                                        res.json({
+                                                            id: playlist_insert_result.insertedId.toString(),
+                                                            user_id: userId.toString(),
+                                                            genres: genreNames,
+                                                            weatherConditions: [weatherCondition],
+                                                            songs: songs,
+                                                            date: new Date(),
+                                                            spotify_url: spotify_url
+                                                        });
                                                     } else {
                                                         console.log('Playlist was not successfully added');
                                                     }
@@ -950,7 +964,15 @@ app.post('/api/playlist', async (req, res) => {
                                             } else {
                                                 console.log("Playlist already in database");
                                                 // Process the successful response here (e.g., display the recommendations)
-                                                res.json({ success: true, playlistId, dbId: existingPlaylist._id }); // Respond with success and playlist details
+                                                res.json({
+                                                    id: existingPlaylist._id.toString(),
+                                                    user_id: userId.toString(),
+                                                    genres: genreNames,
+                                                    weatherConditions: [weatherCondition],
+                                                    songs: songs,
+                                                    date: new Date(),
+                                                    spotify_url: spotify_url
+                                                });
                                             }
 
                                         } catch (error) {
