@@ -1,34 +1,13 @@
 const axios = require('axios');
-
-// put dotenv in the top
 const dotenv = require('dotenv'); 
 dotenv.config();
-
-// const { MongoClient } = require('mongodb');
-// const { MongoClient, ObjectId } = require('mongodb'); // CORA: Added MongoDB integration to access user preferences, genres, and playlists
-// const url = `mongodb+srv://qidiwang:${process.env.DATABASE_PASSWORD}@cluster0.4asd5.mongodb.net/Rhythm?retryWrites=true&w=majority&appName=Cluster0`
-// const client = new MongoClient(url);
-// db_name = process.env.DB_NAME;
-
-
-
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
-// const axios = require('axios')
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');// const mongoose = require('mongoose');
-// const { ObjectId } = mongoose.Types;
 const SpotifyWebApi = require('spotify-web-api-node');
 app.use(cors());
-// Allow CORS for all origins (or specify your frontend origin)
-
-// app.use(cors({
-//     origin: 'http://localhost:5173',  // Update this with your frontend URL
-//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-//     allowedHeaders: ['Content-Type', 'Authorization'],  // Customize as needed
-//   }));
-
 app.use(bodyParser.json());
 app.use((req, res, next) => {
 
@@ -54,13 +33,12 @@ app.use((req, res, next) => {
 
 });
 
-// const uri = "mongodb+srv://ayeshamalik6312:15Q7Ppq14HvqBrVF@rhythmcluster.azwsf.mongodb.net/?retryWrites=true&w=majority&appName=RhythmCluster";
-
 const uri = `mongodb+srv://qidiwang:${process.env.DATABASE_PASSWORD}@cluster0.4asd5.mongodb.net/Rhythm?retryWrites=true&w=majority&appName=Cluster0`
 const client = new MongoClient(uri, {
     serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true },
 });
 
+// Go ahead and connect to the database immediately
 async function connectToDatabase() {
     try {
         await client.connect();
@@ -72,56 +50,6 @@ async function connectToDatabase() {
 connectToDatabase();
 
 
-// Check if the access token is expired, and refresh it if necessary
-async function getAccessToken(userId) {
-
-    userId = userId ? new ObjectId(String(userId)) : '';
-
-    const db = client.db();
-    const usersCollection = db.collection('Users');
-
-    const user = await usersCollection.findOne({ _id: userId });
-    if (!user) {
-        throw new Error('User not found');
-    }
-
-    const { spotifyAccessToken, spotifyRefreshToken, accessTokenExpiration } = user;
-
-    // Check if the access token is expired
-    if (Date.now() > accessTokenExpiration) {
-        console.log('Access token expired, refreshing token...');
-
-        // If expired, refresh the access token using the refresh token
-        try {
-            const data = await spotifyApi.refreshAccessToken();
-            const newAccessToken = data.body['access_token'];
-            spotifyApi.setAccessToken(newAccessToken);
-
-            // Update the new access token and expiration time in the database
-            const expiresIn = data.body['expires_in'];
-            await usersCollection.updateOne(
-                { _id: userId },
-                {
-                    $set: {
-                        spotifyAccessToken: newAccessToken,
-                        accessTokenExpiration: Date.now() + expiresIn * 1000,
-                    },
-                }
-            );
-
-            console.log('Access token refreshed');
-            return newAccessToken;
-        } catch (error) {
-            console.error('Error refreshing access token:', error);
-            throw new Error('Error refreshing access token');
-        }
-    }
-
-    // If the token is still valid, return the current access token
-    return spotifyAccessToken;
-}
-
-
 // Initialize Spotify API Client
 const spotifyApi = new SpotifyWebApi({
     clientId: process.env.SPOTIFY_CLIENT_ID,
@@ -130,14 +58,9 @@ const spotifyApi = new SpotifyWebApi({
     //redirectUri: 'http://54.89.11.234:5000/callback',
 });
 
-console.log("Spotify Client ID:", process.env.SPOTIFY_CLIENT_ID);
-console.log("Spotify Client Secret:", process.env.SPOTIFY_CLIENT_SECRET);
-
-
-app.use(bodyParser.json());
-
 // Spotify Login Route
 app.get('/login', (req, res) => {
+    // Scopes are important for permissions
     const scopes = [
         'user-read-private',
         'user-read-email',
@@ -148,8 +71,6 @@ app.get('/login', (req, res) => {
     res.redirect(authorizeURL);
 });
 
-// Spotify Callback Route
-// Spotify Callback Route
 // Spotify Callback Route
 app.get('/callback', async (req, res) => {
     client.connect();
@@ -172,7 +93,7 @@ app.get('/callback', async (req, res) => {
 
         // Check if the access token is valid by making a simple request to Spotify's "me" endpoint
         const userInfo = await spotifyApi.getMe();
-        console.log("USERINFO: ", userInfo);
+        console.log("Spotify User Info: ", userInfo);
 
         // If we successfully get user info, the access token is valid
         const spotifyId = userInfo.body.id;
@@ -183,7 +104,7 @@ app.get('/callback', async (req, res) => {
         
         const usersCollection = db.collection('Users');
 
-        console.log("Database using Users...");
+        // console.log("Database using Users...");
 
         const existingUser = await usersCollection.findOne({ spotifyId });
 
@@ -240,13 +161,7 @@ app.get('/callback', async (req, res) => {
     }
 });
 
-
-
-
-
 app.get('/api/coord', async (req, res) => {
-    // console.log("Received request:", req.query);
-
     const { cityName, stateName, limit } = req.query;
     const apiKey = process.env.OPENWEATHERMAP_API_KEY;
 
@@ -331,7 +246,7 @@ app.get('/api/coord', async (req, res) => {
         url = `http://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(cityName)}&limit=${limit}&appid=${apiKey}`;
     } 
 
-    console.log("API URL:", url);
+    // console.log("API URL:", url);
 
     try {
         const response = await axios.get(url);
@@ -340,17 +255,12 @@ app.get('/api/coord', async (req, res) => {
         console.error('Error fetching coordinate data:', error); 
         res.status(500).send('Error fetching coordinate data');
     }
-
 });
 
 app.get('/api/weather', async (req, res) => {
-    // console.log("Received request:", req.query);
-
     const { lat, lon } = req.query;
     const apiKey = process.env.OPENWEATHERMAP_API_KEY;
     const url = `https://api.openweathermap.org/data/2.5/weather?lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lon)}&appid=${encodeURIComponent(apiKey)}&units=imperial`;
-
-    // console.log("Constructed URL:", url);
 
     try {
         const response = await axios.get(url);
@@ -359,36 +269,15 @@ app.get('/api/weather', async (req, res) => {
         console.error('Error fetching weather data:', error); 
         res.status(500).send('Error fetching weather data');
     }
-
 });
 
 // Creation:
 app.post('/api/addPreference', async (req, res, next) => {
-    // Assumes that the function calling this function checked if a preference for
-    // this weather condition exists or not. If does not exist, call this function
-    // if it does exist, call updatePreference instead
-    
-    // assumes an array of genres of size at least 1 is passed for one weatherCondition for one user
-    // userId is an objectId. weatherCondition should be used to get objectId. Same with genre
-
-    console.log('Inside addPreference');
-
-    // Remember, another part of this is I need to add the preference to the user in Users
-    // To add it to the Users collection, essentially swap _id and user_id
-    // On second thought, adding preference is updating the already existing user in Users
-        
     client.connect();
-
-    // Assumes that the userId passed is already and ObjectId()
     
     let { userId, weatherCondition, genre } = req.body;
 
     userId = userId ? new ObjectId(String(userId)) : '';
-
-    console.log('The following are the inputs to addPreference');
-    console.log(`userId: ${userId}`);
-    console.log(`weatherCondition: ${weatherCondition}`);
-    console.log(`genre: ${genre}`);
 
     const weatherResponse = await axios.get('http://localhost:5000/api/getWeatherCondition', {
         params : {
@@ -396,60 +285,32 @@ app.post('/api/addPreference', async (req, res, next) => {
         },
     });
 
-    // Now we successfully get the weather object id back
-    // console.log("Weather response:");
-    // console.log(weatherResponse.data);
-
     let weatherId = new ObjectId(String(weatherResponse.data));
 
-    // res.send('Preference added');
-
-    // const genreArray = genre.split(" ");
-    // console.log(genre_array);
-
-    // CORA: Added a check to ensure no more than 5 genres are submitted.
     if (genre.length > 5) {
         return res.status(400).json({
             error: "You can only associate up to 5 genres with a single weather condition.", // Respond with an error message.
         });
     }
-
-    // console.log("genre array: ", genre);
-
     const genreResponses = [];
 
-    // Assumes genre is an array of at least one item
     for (let g of genre) {
-        // console.log(g)
         const genreResponse = await axios.get('http://localhost:5000/api/getGenreId', {
             params : {
                 genreName:g,
             },
         });
 
-        console.log(genreResponse.data);
-
         let genre_objectId = new ObjectId(String(genreResponse.data));
 
-        // console.log("Genre object id", genre_objectId);
-
         genreResponses.push(genre_objectId);
-    }
-
-    console.log("While in add preference, got the genreResponses:",genreResponses);
-    
+    }    
 
     const newPref = { user_id:userId,  weatherCondition:weatherId, associatedGenres:genreResponses};
-
-    console.log("New preference to add: ", newPref);
 
     const db = client.db();
 
     try {
-
-        console.log("About to check if preference exists...");
-
-        // CORA: Check if a preference for this weather condition already exists for the user.
         const existingPreference = await db.collection('UserPreference').findOne({
             user_id: userId,
             weatherCondition: weatherId,
@@ -460,8 +321,6 @@ app.post('/api/addPreference', async (req, res, next) => {
                 error: "Preference for this weather condition already exists. Use the update endpoint to modify it.", // Respond with an error message.
             });
         }
-
-        console.log("Just confirmed preference does not exist...");
 
         const result_addpref = await db.collection('UserPreference').insertOne(newPref);
         console.log(`User Preference inserted with _id: ${result_addpref.insertedId}`);
@@ -482,11 +341,7 @@ app.post('/api/addPreference', async (req, res, next) => {
 });
 
 app.post('/api/updatePreference', async (req, res, next) => {
-    // Takes in the userId and updates the genre list with tne new genre list
     client.connect();
-
-    // Updating the preference should change the list of genres in UserPreference
-    // it might also need to change the list in Users?
 
     let { userId, weatherCondition, genre } = req.body;
 
@@ -498,16 +353,8 @@ app.post('/api/updatePreference', async (req, res, next) => {
         },
     });
 
-    // Now we successfully get the weather object id back
-
     let weatherId = new ObjectId(String(weatherResponse.data));
 
-    // res.send('Preference added');
-
-    // const genreArray = genre.split(" ");
-    // console.log(genre_array);
-
-    // CORA: Added a check to ensure no more than 5 genres are submitted.
     if (genre.length > 5) {
         return res.status(400).json({
             error: "You can only associate up to 5 genres with a single weather condition.", // Respond with an error message.
@@ -516,25 +363,17 @@ app.post('/api/updatePreference', async (req, res, next) => {
 
     const genreResponses = [];
 
-    // Assumes genre is an array of at least one item
     for (let g of genre) {
-        // console.log(g)
         const genreResponse = await axios.get('http://localhost:5000/api/getGenreId', {
             params : {
                 genreName:g,
             },
         });
 
-
         let genre_objectId = new ObjectId(String(genreResponse.data));
 
-        // console.log(genre_objectId);
-
         genreResponses.push(genre_objectId);
-    }
-
-    // console.log(genreResponses);
-    
+    }    
 
     const newPref = { user_id:userId,  weatherCondition:weatherId, associatedGenres:genreResponses};
 
@@ -543,17 +382,11 @@ app.post('/api/updatePreference', async (req, res, next) => {
     const db = client.db();
 
     try {
-        // $set replaces the old value with the new one
         const result_updatepref = await db.collection('UserPreference').updateOne(
             { user_id: userId, weatherCondition:weatherId },
             { $set: { associatedGenres :  genreResponses } }
         );
 
-        // Since it exists already, the inserted id should already be in Users so don't need to call this
-        // const result_updateuser = await db.collection('Users').updateOne(
-        //     { _id : userId},
-        //     { $push: { preferences : result_addpref.insertedId}}
-        // );
         if (result_updatepref.acknowledged) {
             res.status(201).json({
                 message: "Preference updated successfully.", // Success message.
@@ -566,7 +399,6 @@ app.post('/api/updatePreference', async (req, res, next) => {
             });
         }
         
-
     } catch(err) {
         console.error('Error updating document:', err);
     }
@@ -575,15 +407,7 @@ app.post('/api/updatePreference', async (req, res, next) => {
 app.get('/api/getPreference', async (req, res, next) => {
     client.connect();
 
-    console.log("Inside getPreference");
-
-    // console.log(req);
-
-    // Gets the list of genres when given weather name
     let { userId, weatherCondition } = req.query;
-
-    console.log("userId:", userId);
-    console.log("weatherCondition", weatherCondition)
 
     userId = userId ? new ObjectId(String(userId)) : '';
 
@@ -605,11 +429,7 @@ app.get('/api/getPreference', async (req, res, next) => {
         },
     });
 
-    console.log("weatherResponse:", weatherResponse.data);
-
     let weatherId = new ObjectId(String(weatherResponse.data));
-    // console.log("weatherId gained from search: ", weatherId);
-
 
     const db = client.db();
     const collection = db.collection('UserPreference');
@@ -623,15 +443,8 @@ app.get('/api/getPreference', async (req, res, next) => {
             }
         );
 
-        // console.log("weatherId: ", weatherId);
-        // console.log(result);
-
         if (result) {
-            console.log('Successfully got preferences');
-
             let genreArray = result.associatedGenres;
-
-            console.log("passed associated genres: ", genreArray);
 
             let genreNames = [];
 
@@ -647,14 +460,10 @@ app.get('/api/getPreference', async (req, res, next) => {
                 genreNames.push(genreName);
             }
 
-            console.log(genreNames);
-
-            // console.log(genreNames);
             res.status(200).json(genreNames);
         } else { 
             console.log('Did not get preferences');
             res.status(200).json(false);
-            // console.log(userId);
         }
     } catch(err) {
         console.error('Error getting preferences:', err);
@@ -665,13 +474,7 @@ app.get('/api/getPreference', async (req, res, next) => {
 app.get('/api/getPreferenceGenreIds', async (req, res, next) => {
     client.connect();
 
-    // console.log(req);
-
-    // Gets the list of genres when given weather name
     let { userId, weatherCondition } = req.query;
-
-    // console.log("userId:", userId);
-    // console.log("weatherCondition", weatherCondition)
 
     userId = userId ? new ObjectId(String(userId)) : '';
 
@@ -693,17 +496,12 @@ app.get('/api/getPreferenceGenreIds', async (req, res, next) => {
         },
     });
 
-    // console.log("weatherResponse:", weatherResponse.data);
-
     let weatherId = new ObjectId(String(weatherResponse.data));
-    // console.log("weatherId gained from search: ", weatherId);
-
 
     const db = client.db();
     const collection = db.collection('UserPreference');
 
     try {
-        // console.log(`About to search: ${weatherId}`);
         const result = await collection.findOne(
             { 
                 "user_id" : userId,
@@ -711,12 +509,7 @@ app.get('/api/getPreferenceGenreIds', async (req, res, next) => {
             }
         );
 
-        // console.log("weatherId: ", weatherId);
-        // console.log(result);
-
         if (result) {
-            // console.log('Successfully got preferences');
-
             let genreArray = result.associatedGenres;
 
             for (let i = 0; i < genreArray.length; i++) {
@@ -727,14 +520,10 @@ app.get('/api/getPreferenceGenreIds', async (req, res, next) => {
                 }
               }
 
-
-            // console.log("passed associated genres: ", genreArray);
-
             res.status(200).json(genreArray);
         } else { 
             console.log('Did not get preferences');
             res.status(200).json(false);
-            // console.log(userId);
         }
     } catch(err) {
         console.error('Error getting preferences:', err);
@@ -743,15 +532,7 @@ app.get('/api/getPreferenceGenreIds', async (req, res, next) => {
 });
 
 app.get('/api/deletePreference', async (req, res, next) => {
-    // The following API endpoint deletes the entire document,
-    // in other words, it deletes all of the preferences tied to a specific weather pattern
-    // If the user wants to delete genres from their preference, they should use update instead
-
-    // Input should be the name of the weatherCondition and the ObjectId of the user's id
-    // Delete is done, Add is also done. Get doesn't need to refer to Users. Just need to work on Update.
-
     client.connect();
-
 
     let { userId, weatherCondition } = req.query;
 
@@ -765,26 +546,16 @@ app.get('/api/deletePreference', async (req, res, next) => {
 
     let weatherId = new ObjectId(String(weatherResponse.data));
 
-    // console.log("Inside delete preference");
-    // console.log(userId);
-    // console.log(weatherId);
-
-
     const db = client.db();
     const collection = db.collection('UserPreference');
 
     try {
-        // console.log(`User Id: ${userId}, weatherCondition: ${weatherId}`);
-
         const docToDelete = await collection.findOne(
             { 
                 "user_id" : userId,
                 "weatherCondition" : weatherId,
             }
         );
-
-        // console.log("doc to delete:");
-        // console.log(docToDelete)
 
         const result = await collection.deleteOne(
             { 
@@ -793,27 +564,15 @@ app.get('/api/deletePreference', async (req, res, next) => {
             }
         );
 
-        // console.log("Result from deletion");
-        // console.log(result);
-
         const result_updateuser = await db.collection('Users').updateOne(
             { _id : userId},
             { $pull: { preferences : docToDelete._id}}
         );
-
-        // console.log("Update user result");
-        // console.log(result_updateuser);
-
-        // console.log("Acknowledged:");
-        // console.log(result.acknowledged);
         
         if (result.acknowledged && result_updateuser) {
             console.log("Return status 200");
-            // have to add a value to return via json
             res.status(200).json(true);
         }
-
-        // console.log("Outside if statement");
     } catch (error) {
         console.log(`Error deleting preference: ${error}`);
         res.status(404).json(false);
@@ -830,12 +589,6 @@ app.get('/api/getWeatherCondition', async (req, res, next) => {
     console.log("inside getWeatherCondition");
     console.log(weatherName);
 
-    // weatherName = weatherName ? String(weatherName).trim() : '';
-
-    // console.log("Searching id of: ", weatherName);
-
-    // if statement to string together weather api response to database names
-
     const atmosphere_list = ["Mist", "Smoke", "Haze", "Dust", "Fog", "Sand", "Dust", "Ash", "Squall", "Tornado"];
 
     if (weatherName == 'Drizzle' || weatherName == 'Thunderstorm' || weatherName == 'Rain'){
@@ -848,8 +601,6 @@ app.get('/api/getWeatherCondition', async (req, res, next) => {
         weatherName = 'sunny';
     }
 
-    // console.log("After Conversion", weatherName);
-
     const db = client.db();
 
     try {
@@ -857,19 +608,9 @@ app.get('/api/getWeatherCondition', async (req, res, next) => {
                 .findOne(
                     { "condition_name": weatherName});
                 
-
-        // console.log(result);
-
         if (result) {
-            // var ret = { resultId:result._id, error:error };
-            // console.log(ret)
-            // res.status(200).json(ret);
             res.status(200).json(result._id);
         } else {
-            // error = '_id of weather condition is null';
-            // var ret = { resultId:result, error:error };
-            // // console.log(ret)
-            // res.status(404).json(ret)
             res.status(200).json('');
         }
      
@@ -889,21 +630,14 @@ app.get('/api/getGenreId', async (req, res, next) => {
 
     genreName = genreName ? String(genreName).trim() : '';
 
-    // console.log("genreName: ", genreName);
-
     const db = client.db();
 
     const result = await db.collection('Genre')
                     .findOne({ "genre_id": genreName});
 
-    // console.log(result);
-
     if (result) {
-        // var ret = { resultId:result._id, error:error };
         res.status(200).json(result._id);
     } else {
-        // error = '_id of genre is null';
-        // var ret = { resultId:result, error:error };
         res.status(404).json('')
     }
 });
@@ -913,29 +647,18 @@ app.get('/api/getGenreName', async (req, res, next) => {
 
     var error = '';
     
-    // Since req.query.genreId is just one value, no need for {} to do destructuring
     let genreId = req.query.genreId;
 
     genreId = genreId ? new ObjectId(String(genreId)) : '';
-
-    // console.log(`Genre Id: ${genreId}`);
-
-
 
     const db = client.db();
 
     const result = await db.collection('Genre')
                     .findOne({ "_id": genreId});
 
-    console.log("Result that it found:", result);
-
     if (result) {
-        // var ret = { genreName:result.genre_name, error:error };
-        // console.log(ret);
         res.status(200).json(result.genre_id);
     } else {
-        // error = '_id of genre is null';
-        // var ret = { genreName:result, error:error };
         res.status(404).json('')
     }
 });
@@ -943,7 +666,6 @@ app.get('/api/getGenreName', async (req, res, next) => {
 app.get('/api/getUser', async (req, res, next) => {
     client.connect();
     
-    // Since req.query.genreId is just one value, no need for {} to do destructuring
     let userId = req.query.userId;
 
     userId = userId ? new ObjectId(String(userId)) : '';
@@ -953,8 +675,6 @@ app.get('/api/getUser', async (req, res, next) => {
     const result = await db.collection('Users')
                     .findOne({ "_id": userId});
 
-    // console.log(result);
-
     if (result) {
         res.status(200).json(result);
     } else {
@@ -962,20 +682,13 @@ app.get('/api/getUser', async (req, res, next) => {
     }
 });
 
-// CORA: Spotify playlist generation
 app.post('/api/playlist', async (req, res) => {
-    // const { userId, lat, lon , weatherCondition} = req.body; // New endpoint for generating Spotify playlists
     let { userId, weatherCondition} = req.body; // New endpoint for generating Spotify playlists
     
-    console.log("Inside playlist endpoint with parameters: ", userId, weatherCondition);
-
     userId = userId ? new ObjectId(String(userId)) : '';
-
 
     try {    
         const atmosphere_list = ["Mist", "Smoke", "Haze", "Dust", "Fog", "Sand", "Dust", "Ash", "Squall", "Tornado"];
-
-        console.log("Line 903");
 
         if (weatherCondition == 'Drizzle' || weatherCondition == 'Thunderstorm' || weatherCondition == 'Rain'){
             weatherCondition = 'rainy';
@@ -987,18 +700,7 @@ app.post('/api/playlist', async (req, res) => {
             weatherCondition = 'sunny';
         }
 
-        console.log("Line 915");
-
-
-        console.log("After Conversion", weatherCondition);
-
-        console.log("Line 920");
-
-        // Retrieve user preferences for the current weather condition
-
         try {
-            console.log("Line 925");
-            // getPreference handles getting the genre ids returns an array of the corresponding names of those genres
             const response = await axios.get('http://localhost:5000/api/getPreference', {
                 params:{
                     userId:userId,
@@ -1006,57 +708,41 @@ app.post('/api/playlist', async (req, res) => {
                 },
             });
 
-            console.log("Line 934");
-
-            console.log("Just got preference in playlist api: ", response.data);
+            // console.log("Just got preference in playlist api: ", response.data);
 
             const genreNames = response.data;
-
-            console.log("Line 940");
 
             if (genreNames.length === 0) {
                 console.log("Line 943");
                 return res.status(404).send('No genres associated with the current weather condition.'); // Return if no genres found
             }
 
-            console.log("Line 947");
-
-            // Generate Spotify playlist using user's preferences
-            // const user = await db.collection('User').findOne({ _id: new ObjectId(userId) }); // Retrieve user data for Spotify integration
-            
+            // Generate Spotify playlist using user's preferences            
             try {
-                console.log("Line 953");
-                console.log("Now trying to get user...");
+                // console.log("Now trying to get user...");
                 const user = await axios.get('http://localhost:5000/api/getUser', {
                     params:{
                         userId:userId,
                     },
                 });
 
-                console.log("Line 961");
-
                 // console.log("Result from getUser: ", user.data);
 
                 try {
-                    console.log("Line 966");
                     let refreshToken = user.data.spotifyRefreshToken;
                     let clientId = process.env.SPOTIFY_CLIENT_ID;
                     let clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
 
-                    console.log("Line 971");
+                    // console.log("Refresh Token:", refreshToken);
+                    // console.log("ClientId: ", clientId);
+                    // console.log("ClientSecret:", clientSecret);
 
-                    console.log("Refresh Token:", refreshToken);
-                    console.log("ClientId: ", clientId);
-                    console.log("ClientSecret:", clientSecret);
-
-                    console.log('Trying to get new access token...');
+                    // console.log('Trying to get new access token...');
 
                     // New technique to keep getting new access tokens - Joanne
                     try {
-                        console.log("Line 981");
                         const base64Credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-                        console.log("Line 983");
-                        console.log('Base64 Encoded Credentials:', base64Credentials);
+                        // console.log('Base64 Encoded Credentials:', base64Credentials);
                         const tokenResponse = await axios.post('https://accounts.spotify.com/api/token', new URLSearchParams({
                             grant_type: 'refresh_token',  // Correct grant_type
                             refresh_token: refreshToken   // Your existing refresh token
@@ -1066,14 +752,11 @@ app.post('/api/playlist', async (req, res) => {
                                 'Content-Type': 'application/x-www-form-urlencoded' // Ensure content type is correctly set
                             }
                         });
-                        console.log("Line 994");
-                        console.log('Token response:', tokenResponse.data);  // Inspect the response
+                        // console.log('Token response:', tokenResponse.data);  // Inspect the response
                     
                         const spotifyToken = tokenResponse.data.access_token;
 
-                        console.log("Line 999");
-
-                        console.log("New Access Token:", spotifyToken);
+                        // console.log("New Access Token:", spotifyToken);
 
                         let userProfile = '';
 
@@ -1090,51 +773,18 @@ app.post('/api/playlist', async (req, res) => {
                         }
 
                         if (!spotifyToken) {
-                            console.log("Line 1004");
                             console.log("!spotifyToken triggered");
                             return res.status(401).send('Spotify token missing or invalid. Please reauthenticate.'); // Check for valid Spotify token
                         }
 
-                        console.log("Line 1009");
+                        // console.log("About to make spotify API call...");
+                        // console.log("GENRENAMES::", genreNames);
+                        // console.log("seed_genres: ", genreNames.join(','));
 
-                        console.log("About to make spotify API call...");
-                        console.log("GENRENAMES::", genreNames);
-                        console.log("seed_genres: ", genreNames.join(','));
-
-                        console.log("Line 1014");
                         try {
-                            console.log("Line 1016");
                             const encodedGenres = encodeURIComponent(genreNames.join(','));
 
-                            // const genre = 'jazz';  // Specify the genre you're interested in
                             const search_url = `https://api.spotify.com/v1/search?q=genre:${encodedGenres}&type=track&limit=10`;
-
-                            let spotifyTracks = {};
-
-                            // fetch(search_url, {
-                            //     method: 'GET',
-                            //     headers: {
-                            //         'Authorization': `Bearer ${spotifyToken}`,
-                            //         'Content-Type': 'application/json'
-                            //     }
-                            // })
-                            // .then(response => response.json())  // Convert response to JSON
-                            // .then(data => {
-                            //     console.log("SEARCH DATA:", data);
-
-                            //     // spotifyResponse = data;
-
-                            //     // Process and display the track data
-                            //     const tracks = data.tracks.items;
-
-                            //     spotifyTracks = tracks;
-
-
-                            //     tracks.forEach(track => {
-                            //         console.log(`Track: ${track.name} | Artist: ${track.artists[0].name} | URL: ${track.external_urls.spotify}`);
-                            //     });
-                            // })
-                            // .catch(error => console.error('SEARCH ERROR:', error));
 
                             try {
                                 const response = await fetch(search_url, {
@@ -1145,29 +795,11 @@ app.post('/api/playlist', async (req, res) => {
                                     }
                                 });
                                 const data = await response.json();  // Convert response to JSON
-                        
-                                // console.log("SEARCH DATA:", data);
-                        
+                                                
                                 // Process and return the tracks
                                 const tracks = data.tracks.items;
 
-                                // const spotifyTracks = tracks;
-
-                                console.log("Line 1025");
-
-
-                                // console.log("Spotify Response:");
-                                // console.log(spotifyResponse.data);
-
-                                console.log("Line 1031");
-
-                                // const tracks = spotifyResponse.data.tracks.items; // Fetch recommended tracks
-                                // console.log("tracks variable:", spotifyTracks);
-                                console.log("Line 1034");
-                                // const trackUris = tracks.map((track) => track.uri); // Extract track URIs
                                 const trackUrls = tracks.map((track) => track.external_urls.spotify);
-
-                                // console.log("trackURIs: ", trackUris);
 
                                 // Convert URLs to Spotify URIs
                                 const trackURIs = trackUrls.map(url => {
@@ -1177,13 +809,9 @@ app.post('/api/playlist', async (req, res) => {
                                 
                                 console.log(trackURIs);
                                   
-                                
-
-                                // console.log("Line 1037");
-
-                                // // Create a Spotify playlist
+                                // Create a Spotify playlist
                                 try {
-                                    console.log("About to try making playlist... user id:", userProfile.data.id);
+                                    // console.log("About to try making playlist... user id:", userProfile.data.id);
                                     const playlistResponse = await axios.post(
                                         `https://api.spotify.com/v1/users/${userProfile.data.id}/playlists`,
                                         {
@@ -1195,16 +823,12 @@ app.post('/api/playlist', async (req, res) => {
                                             headers: { Authorization: `Bearer ${spotifyToken}` },
                                         }
                                     );
-                                    console.log("Line 1051");
 
                                     const playlistId = playlistResponse.data.id; // Get created playlist ID
 
                                     console.log("Playlist id: ", playlistId);
 
-                                    console.log("Line 1055");
-
                                     try {
-                                        console.log("Line 1058");
                                         // Add tracks to the playlist
                                         await axios.post(
                                             `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
@@ -1213,7 +837,7 @@ app.post('/api/playlist', async (req, res) => {
                                         );
                                         console.log("Tracks Added");
 
-                                        console.log("About to get genre ids: ", userId, weatherCondition);
+                                        // console.log("About to get genre ids: ", userId, weatherCondition);
 
                                         try {
                                             const genre_id_response = await axios.get('http://localhost:5000/api/getPreferenceGenreIds', {
@@ -1232,7 +856,15 @@ app.post('/api/playlist', async (req, res) => {
                                                     },
                                                 });
 
-                                                // console.log("genreIds", genreIds);
+
+                                                // Save songs to database
+                                                try {
+                                                    // First, search for the track id to see if it exists or not
+                                                    // if it exists, no need to add
+                                                    // if it does not exist, then add it
+                                                } catch (err) {
+                                                    console.log("Error saving songs to database:", err);
+                                                }
 
                                                 // Save playlist to database
                                                 const playlistDbEntry = {
