@@ -33,7 +33,7 @@ app.use((req, res, next) => {
 
 });
 
-const uri = `mongodb+srv://qidiwang:${process.env.DATABASE_PASSWORD}@cluster0.4asd5.mongodb.net/Rhythm?retryWrites=true&w=majority&appName=Cluster0`
+const uri = process.env.MONGODB_URI
 const client = new MongoClient(uri, {
     serverApi: { version: ServerApiVersion.v1, strict: true, deprecationErrors: true },
 });
@@ -858,46 +858,46 @@ app.post('/api/playlist', async (req, res) => {
 
 
                                                 // Save songs to database
-                                                try {
-                                                    // First, search for the track id to see if it exists or not
-                                                    // if it exists, no need to add
-                                                    // if it does not exist, then add it
-                                                } catch (err) {
-                                                    console.log("Error saving songs to database:", err);
-                                                }
+                                                // try {
+                                                //     // First, search for the track id to see if it exists or not
+                                                //     // if it exists, no need to add
+                                                //     // if it does not exist, then add it
+                                                // } catch (err) {
+                                                //     console.log("Error saving songs to database:", err);
+                                                // }
 
-                                                // Save playlist to database
-                                                const playlistDbEntry = {
-                                                    user_id: userId,
-                                                    genres: genreIds, // Genres associated with the playlist
-                                                    weatherConditions: new ObjectId(String(weatherResponse.data)), // Weather condition associated with the playlist
-                                                    songs: tracks.map((track) => ({
-                                                        track_id: track.id,
-                                                        track_name: track.name,
-                                                        artist_name: track.artists[0].name, // Save song metadata
-                                                    })),
-                                                    date: new Date(), // Timestamp of playlist creation
-                                                };
+                                                // // Save playlist to database
+                                                // const playlistDbEntry = {
+                                                //     user_id: userId,
+                                                //     genres: genreIds, // Genres associated with the playlist
+                                                //     weatherConditions: new ObjectId(String(weatherResponse.data)), // Weather condition associated with the playlist
+                                                //     songs: tracks.map((track) => ({
+                                                //         track_id: track.id,
+                                                //         track_name: track.name,
+                                                //         artist_name: track.artists[0].name, // Save song metadata
+                                                //     })),
+                                                //     date: new Date(), // Timestamp of playlist creation
+                                                // };
 
-                                                console.log(playlistDbEntry);
+                                                // console.log(playlistDbEntry);
 
-                                                console.log("Line 1080");
+                                                // console.log("Line 1080");
 
-                                                try {
-                                                    const result = await db.collection('Playlist').insertOne(playlistDbEntry);
+                                                // try {
+                                                //     const result = await db.collection('Playlist').insertOne(playlistDbEntry);
                                                 
-                                                    if (result.acknowledged) {
-                                                        console.log('Playlist inserted with id:', result.insertedId);
-                                                    }
+                                                //     if (result.acknowledged) {
+                                                //         console.log('Playlist inserted with id:', result.insertedId);
+                                                //     }
                                                     
-                                                    res.json({ success: true, playlistId, dbId: result.insertedId });
-                                                } catch (error) {
-                                                    if (error.code === 11000) {
-                                                        console.log('Duplicate entry: A document with this _id already exists.');
-                                                    } else {
-                                                        console.error('Error inserting document:', error);
-                                                    }
-                                                }
+                                                //     res.json({ success: true, playlistId, dbId: result.insertedId });
+                                                // } catch (error) {
+                                                //     if (error.code === 11000) {
+                                                //         console.log('Duplicate entry: A document with this _id already exists.');
+                                                //     } else {
+                                                //         console.error('Error inserting document:', error);
+                                                //     }
+                                                // }
 
                                                 // const result = await db.collection('Playlist').insertOne(playlistDbEntry); // Save playlist data to Playlist collection
 
