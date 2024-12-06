@@ -843,11 +843,13 @@ app.post('/api/playlist', async (req, res) => {
                                 // Create a Spotify playlist
                                 try {
                                     // console.log("About to try making playlist... user id:", userProfile.data.id);
+                                    let wName = weatherCondition.charAt(0).toUpperCase() + weatherCondition.slice(1);
+                                    
                                     const playlistResponse = await axios.post(
                                         `https://api.spotify.com/v1/users/${userProfile.data.id}/playlists`,
                                         {
-                                            name: `Weather-based Playlist (${weatherCondition})`,
-                                            description: `A playlist based on the current weather: ${weatherCondition}`, // Playlist description includes weather condition
+                                            name: `Weather-Based Playlist (${wName})`,
+                                            description: `A playlist for a ${weatherCondition} day...`, // Playlist description includes weather condition
                                             public: false,
                                         },
                                         {

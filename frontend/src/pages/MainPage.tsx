@@ -60,46 +60,14 @@ const MainPage: React.FC = () => {
     // const navigate = useNavigate();     // CORA: Added to handle navigation to the preferences page
 
     useEffect(() => {
-        // const handleSpotifyCallback = async () => { // Added function to process Spotify callback
-        //     const params = new URLSearchParams(window.location.search); // Added parse query parameters from URL
-        //     const code = params.get('code'); // Extract the authorization code
-
-        //     if (code) { // Check if code exists in URL
-        //         try {
-        //             const response = await axios.get('http://localhost:5000/api/callback', { // Call backend API to handle callback
-        //                 params: { code }, // Pass the code to the backend
-        //             });
-
-        //             const { username, userId } = response.data; // Extract username and userId from response
-        //             localStorage.setItem('spotifyUsername', username); // Store username in localStorage
-        //             localStorage.setItem('user_id', userId); // Store user ID in localStorage for API calls
-
-        //             navigate('/preferences'); // Redirect to preferences page after successful authentication
-        //         } catch (error) {
-        //             console.error('Error during Spotify callback:', error); // Log any errors
-        //             alert('Spotify authentication failed. Please try again.'); // Show user an error message
-        //         }
-        //     }
-        // };
-
-        // CORA
-        // useEffect(() => {
-        //     const code = localStorage.getItem('spotifyCode'); // Retrieve Spotify code from localStorage
-        //     if (code) {
-        //         handleSpotifyCallback(); // Call function to fetch Spotify username
-        //     }
-        // }, []);
-
 
         // CORA: Fetch Spotify playlist based on weather
         const fetchPlaylist = async (weather: Weather) => {
-            console.log("Inside fetch playlist");
+            // console.log("Inside fetch playlist");
 
             try {
                 const response = await axios.post('http://localhost:5000/api/playlist', {
                     userId: localStorage.getItem("user_id"),
-                    // lat: weather.lat, // Assuming weather API returns lat/lon
-                    // lon: weather.lon,
                     weatherCondition: weather.condition,
                 });
                 setPlaylist(response.data); // CORA: Update state with playlist data from backend.

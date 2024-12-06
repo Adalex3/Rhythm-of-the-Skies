@@ -30,6 +30,8 @@ interface PlaylistDisplayProps {
 
 const PlaylistDisplay: React.FC<PlaylistDisplayProps> = ({ playlist }) => {
 
+    console.log("Inside playlist display");
+
     const isDaytime = new Date().getHours() >= 7 && new Date().getHours() < 18;
 
     const getGenreText = (genres: String[]) => {
@@ -43,7 +45,8 @@ const PlaylistDisplay: React.FC<PlaylistDisplayProps> = ({ playlist }) => {
         }
     };
 
-    const formatDuration = (seconds: number): string => {
+    const formatDuration = (milliseconds: number): string => {
+        const seconds = Math.floor(milliseconds/1000)
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = seconds % 60;
         return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
