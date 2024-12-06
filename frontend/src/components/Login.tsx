@@ -15,6 +15,9 @@ function Login() {
         localStorage.setItem("user_id",String(spotify_id));
 
         // Now we can use localStorage.getItem("user_id") to get it
+        
+        // Going to Spotify Authentication
+        window.location.href = "http://localhost:5000/login"
     }
     return (
         <a className="login-btn" href="#" onClick={doLogin}><p>Login with Spotify</p></a>
