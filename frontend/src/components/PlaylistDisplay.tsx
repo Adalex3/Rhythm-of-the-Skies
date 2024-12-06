@@ -1,27 +1,27 @@
 import React from "react";
-    import "../main.css";
+import "../main.css";
 
 interface Song {
-    id: string;
-    track_id: string;
-    track_name: string;
-    artist_name: string;
-    artist_id: string;
-    album_name: string;
-    album_id: string;
-    album_image_url: string;
-    track_url: string;
-    duration: number;
+  id: string;
+  track_id: string;
+  track_name: string;
+  artist_name: string;
+  artist_id: string;
+  album_name: string;
+  album_id: string;
+  album_image_url: string;
+  track_url: string;
+  duration: number;
 }
 
 interface Playlist {
-    id: string;
-    user_id: string;
-    genres: String[];
-    weatherConditions: String[];
-    songs: Song[];
-    date: Date;
-    spotify_url: string;
+  id: string;
+  user_id: string;
+  genres: String[];
+  weatherConditions: String[];
+  songs: Song[];
+  date: Date;
+  spotify_url: string;
 }
 
 interface PlaylistDisplayProps {
@@ -29,57 +29,75 @@ interface PlaylistDisplayProps {
 }
 
 const PlaylistDisplay: React.FC<PlaylistDisplayProps> = ({ playlist }) => {
+  const isDaytime = new Date().getHours() >= 7 && new Date().getHours() < 18;
 
-    const isDaytime = new Date().getHours() >= 7 && new Date().getHours() < 18;
+  const getGenreText = (genres: String[]) => {
+    if (!genres || genres.length === 0) {
+      return "No genres found";
+    } else if (genres.length === 1) {
+      return genres[0];
+    } else if (genres.length === 2) {
+      return `${genres[0]} & ${genres[1]}`;
+    } else {
+      const allGenres = [...genres]; // Copy array so we don't mutate the original
+      const lastGenre = allGenres.pop();
+      return `${allGenres.join(", ")}, & ${lastGenre}`;
+    }
+  };
 
-    const getGenreText = (genres: String[]) => {
-        if (genres.length === 1) {
-            return genres[0];
-        } else if (genres.length === 2) {
-            return `${genres[0]} & ${genres[1]}`;
-        } else {
-            const lastGenre = genres.pop();
-            return `${genres.join(", ")}, & ${lastGenre}`;
-        }
-    };
+  const formatDuration = (ms: number): string => {
+    // Original code used seconds, but Spotify track durations are in ms
+    // Convert ms to seconds first
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
 
-    const formatDuration = (seconds: number): string => {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-        return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-    };
-
+  // Safely handle if no songs are returned
+  const hasSongs = playlist.songs && playlist.songs.length > 0;
+ 
   return (
     <div className="playlist-display">
-        <div className="top-content">
-            <div className="image-side">
-                <img src={playlist.songs[0].album_image_url}></img>
+      <div className="top-content">
+        <div className="image-side">
+          {hasSongs ? (
+            <img src={playlist.songs[0].album_image_url} alt="Album Cover"/>
+          ) : (
+            <div className="no-songs-placeholder">
+              <p>No songs available</p>
             </div>
-            <div className="songs-side">
-                <h3 className="vibe-title">{isDaytime ? "Today's vibes are:" : "Tonight's vibes are:"}</h3>
-                <p className="vibe">{getGenreText(playlist.genres)}</p>
-                <div className="song-list">
-                    {playlist.songs.map((song, index) => (
-                    <div className="song" key={index}>
-                        <div className="title-artist">
-                        <p className="title">{song.track_name}</p>
-                        <p className="artist">{song.artist_name}</p>
-                        </div>
-                        <p className="duration">{formatDuration(song.duration)}</p>
-                    </div>
-                    ))}
+          )}
+        </div>
+        <div className="songs-side">
+          <h3 className="vibe-title">{isDaytime ? "Today's vibes are:" : "Tonight's vibes are:"}</h3>
+          <p className="vibe">{getGenreText(playlist.genres)}</p>
+          <div className="song-list">
+            {hasSongs ? (
+              playlist.songs.map((song, index) => (
+                <div className="song" key={index}>
+                  <div className="title-artist">
+                    <p className="title">{song.track_name}</p>
+                    <p className="artist">{song.artist_name}</p>
+                  </div>
+                  <p className="duration">{formatDuration(song.duration)}</p>
                 </div>
-            </div>
+              ))
+            ) : (
+              <p>No songs to display for this playlist.</p>
+            )}
+          </div>
         </div>
-        <div className="bottom-content">
-            <button className="spotify-button" onClick={() => {
-                window.location.href = playlist.spotify_url;
-            }}
-            >Play on Spotify</button>
-            <button className="preferences-button" onClick={() => {
-                window.location.href = "/preferences";
-            }}>Edit preferences <img className="gear" src="../src/assets/gear.png"></img></button>
-        </div>
+      </div>
+      <div className="bottom-content">
+        <button className="spotify-button" onClick={() => {
+          window.location.href = playlist.spotify_url;
+        }}
+        >Play on Spotify</button>
+        <button className="preferences-button" onClick={() => {
+          window.location.href = "/preferences";
+        }}>Edit preferences <img className="gear" src="../src/assets/gear.png" alt="gear icon"></img></button>
+      </div>
     </div>
   );
 };
