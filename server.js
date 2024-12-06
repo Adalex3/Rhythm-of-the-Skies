@@ -683,6 +683,8 @@ app.get('/api/getUser', async (req, res, next) => {
 });
 
 app.post('/api/playlist', async (req, res) => {
+    const db = client.db('Rhythm');
+
     let { userId, weatherCondition} = req.body; // New endpoint for generating Spotify playlists
     
     userId = userId ? new ObjectId(String(userId)) : '';
@@ -799,6 +801,8 @@ app.post('/api/playlist', async (req, res) => {
                                 // Process and return the tracks
                                 const tracks = data.tracks.items;
 
+                                // console.log(tracks);
+
                                 const trackUrls = tracks.map((track) => track.external_urls.spotify);
 
                                 // Convert URLs to Spotify URIs
@@ -837,87 +841,125 @@ app.post('/api/playlist', async (req, res) => {
                                         );
                                         console.log("Tracks Added");
 
-                                        // console.log("About to get genre ids: ", userId, weatherCondition);
+                                        let songs_ids = [];
 
-                                        try {
-                                            const genre_id_response = await axios.get('http://localhost:5000/api/getPreferenceGenreIds', {
-                                                params:{
-                                                    userId:userId,
-                                                    weatherCondition:weatherCondition,
-                                                },
-                                            });
+                                        for (item of tracks) {
+                                            // Assume that each item is from tracks
+                                            const songEntry = {
+                                                track_id: item.id,
+                                                track_name: item.name, 
+                                                artist_name: item.artists[0].name, 
+                                                artist_id: item.artists[0].id, 
+                                                album_name: item.album.name, 
+                                                album_id: item.album.id, 
+                                                album_image_url: item.album.images[0].url,
+                                                track_url: item.external_urls.spotify,
+                                                duration: item.duration_ms
+                                            };
 
-                                            let genreIds = genre_id_response.data;
+                                            // console.log("Song Entry:");
+                                            // console.log(songEntry);
 
                                             try {
-                                                const weatherResponse = await axios.get('http://localhost:5000/api/getWeatherCondition', {
-                                                    params : {
-                                                        weatherName:weatherCondition,
-                                                    },
-                                                });
+                                                const existingSong = await db.collection('Song').findOne({ track_id: songEntry.track_id });
 
-
-                                                // Save songs to database
-                                                // try {
-                                                //     // First, search for the track id to see if it exists or not
-                                                //     // if it exists, no need to add
-                                                //     // if it does not exist, then add it
-                                                // } catch (err) {
-                                                //     console.log("Error saving songs to database:", err);
-                                                // }
-
-                                                // // Save playlist to database
-                                                // const playlistDbEntry = {
-                                                //     user_id: userId,
-                                                //     genres: genreIds, // Genres associated with the playlist
-                                                //     weatherConditions: new ObjectId(String(weatherResponse.data)), // Weather condition associated with the playlist
-                                                //     songs: tracks.map((track) => ({
-                                                //         track_id: track.id,
-                                                //         track_name: track.name,
-                                                //         artist_name: track.artists[0].name, // Save song metadata
-                                                //     })),
-                                                //     date: new Date(), // Timestamp of playlist creation
-                                                // };
-
-                                                // console.log(playlistDbEntry);
-
-                                                // console.log("Line 1080");
-
-                                                // try {
-                                                //     const result = await db.collection('Playlist').insertOne(playlistDbEntry);
-                                                
-                                                //     if (result.acknowledged) {
-                                                //         console.log('Playlist inserted with id:', result.insertedId);
-                                                //     }
+                                                if (!existingSong) {
+                                                    try {
+                                                        const song_insert_result = await db.collection('Song').insertOne(songEntry);
                                                     
-                                                //     res.json({ success: true, playlistId, dbId: result.insertedId });
-                                                // } catch (error) {
-                                                //     if (error.code === 11000) {
-                                                //         console.log('Duplicate entry: A document with this _id already exists.');
-                                                //     } else {
-                                                //         console.error('Error inserting document:', error);
-                                                //     }
-                                                // }
-
-                                                // const result = await db.collection('Playlist').insertOne(playlistDbEntry); // Save playlist data to Playlist collection
-
-                                                // console.log("Line 1084");
-
-                                                // res.json({ success: true, playlistId, dbId: result.insertedId }); // Respond with success and playlist details
-
-                                                console.log("Line 1088");
-                                            } catch (err) {
-                                                console.log("Error getting weather condition id", err);
+                                                        if (song_insert_result.acknowledged) {
+                                                            console.log('Song inserted with id:', song_insert_result.insertedId);
+                                                            songs_ids.push(song_insert_result.insertedId)
+                                                        } else {
+                                                            console.log('Song was not successfully added');
+                                                        }
+                                                    } catch (err) {
+                                                        if (error.code === 11000) {
+                                                            console.log('Duplicate entry: A song with this _id already exists.');
+                                                        } else {
+                                                            console.error('Error inserting song:', error);
+                                                        }
+                                                    }                                            
+                                                } else {
+                                                    console.log("Song already in database");
+                                                    songs_ids.push(existingSong._id)
+                                                }
+            
+                                            } catch (error) {
+                                                console.log("Error finding song in database", error);
                                             }
-                                        } catch (err){
-                                            console.log("Error geting the array of genre Ids", err);
                                         }
+
+                                        const weatherResponse = await axios.get('http://localhost:5000/api/getWeatherCondition', {
+                                            params : {
+                                                weatherName:weatherCondition,
+                                            },
+                                        });
+
+                                        const genre_id_response = await axios.get('http://localhost:5000/api/getPreferenceGenreIds', {
+                                            params:{
+                                                userId:userId,
+                                                weatherCondition:weatherCondition,
+                                            },
+                                        });
+
+                                        let genreIds = genre_id_response.data;
+                                        let genreObjectIds = [];
+
+                                        for (g of genreIds) {
+                                            genreObjectIds.push(new ObjectId(String(g)));
+                                        }
+
+                                        // Save playlist to database
+                                        const playlistDbEntry = {
+                                            user_id: userId,
+                                            genres: genreObjectIds, // Genres associated with the playlist
+                                            weatherConditions: new ObjectId(String(weatherResponse.data)), // Weather condition associated with the playlist
+                                            songs: songs_ids,
+                                            date: new Date(), // Timestamp of playlist creation
+                                        };
+
+                                        console.log(playlistDbEntry);
+
+                                        try {
+                                            const existingPlaylist = await db.collection('Playlist').findOne({ 
+                                                user_id: userId,
+                                                genres: genreObjectIds, 
+                                                weatherConditions: new ObjectId(String(weatherResponse.data)),
+                                                songs: songs_ids,
+                                            });
+
+                                            if (!existingPlaylist) {
+                                                try {
+                                                    const playlist_insert_result = await db.collection('Playlist').insertOne(playlistDbEntry);
+                                                
+                                                    if (playlist_insert_result.acknowledged) {
+                                                        console.log('Playlist inserted with id:', playlist_insert_result.insertedId);
+                                                        // Process the successful response here (e.g., display the recommendations)
+                                                        res.json({ success: true, playlistId, dbId: playlist_insert_result.insertedId }); // Respond with success and playlist details
+                                                    } else {
+                                                        console.log('Playlist was not successfully added');
+                                                    }
+                                                } catch (err) {
+                                                    if (error.code === 11000) {
+                                                        console.log('Duplicate entry: A playlist with this _id already exists.');
+                                                    } else {
+                                                        console.error('Error inserting playlist:', error);
+                                                    }
+                                                }                                            
+                                            } else {
+                                                console.log("Playlist already in database");
+                                                // Process the successful response here (e.g., display the recommendations)
+                                                res.json({ success: true, playlistId, dbId: existingPlaylist._id }); // Respond with success and playlist details
+                                            }
+
+                                        } catch (error) {
+                                            console.log("Error finding song in database", error);
+                                        }
+
                                     } catch(err) {
                                         console.log("Error adding tracks to playlist", err);
-                                        // return res.status(404).send('Error adding tracks to playlist'); 
                                     }
-
-                                    // console.log("Line 1094");
                                 } catch (err) {
                                     console.log("Error making Spotify Playlist", err);
                                 }
@@ -926,7 +968,7 @@ app.post('/api/playlist', async (req, res) => {
                                 console.error('SEARCH ERROR:', error);
                             }
                         
-                            // Process the successful response here (e.g., display the recommendations)
+                            
                         } catch (error) {
 
                             console.log("Line 1099");
