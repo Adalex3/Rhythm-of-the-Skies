@@ -55,6 +55,7 @@ const MainPage: React.FC = () => {
     const [playlist, setPlaylist] = useState<Playlist | null>(null);
     const [cityName, setCityName] = useState(''); 
     const [stateName, setStateName] = useState(''); 
+    const [isFetching, setIsFetching] = useState(false);
     const [spotifyUsername, setSpotifyUsername] = useState(localStorage.getItem("spotifyUsername")); // CORA: Fetch Spotify username and store it
     
     // const navigate = useNavigate();     // CORA: Added to handle navigation to the preferences page
@@ -77,6 +78,8 @@ const MainPage: React.FC = () => {
         };
         
         const fetchWeather = async () => {
+            if (isFetching) return; // Prevent fetching if already in progress
+            setIsFetching(true);
             try {
                 // TODO: GET WEATHER FROM API (JOANNE)
 
@@ -152,6 +155,8 @@ const MainPage: React.FC = () => {
                 }
             } catch (error) {
                 console.error('Error fetching weather data:', error);
+            } finally {
+                setIsFetching(false);
             }
         };
 
