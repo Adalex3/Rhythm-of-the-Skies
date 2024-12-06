@@ -6,12 +6,12 @@ function Login() {
     function doLogin(event: any): void {
         event.preventDefault();
         
-        // TODO: Ayesha add Spotify API!
+        // TODO:
         console.log("LOGGING IN WITH SPOTIFY...");
-        /* NOAH CHANGES:
+        /* NOAH CHANGES: */ 
         window.location.href=('https://rhythmoftheskies.xyz/login');
-        */ 
-        window.location.href = "http://localhost:5000/login"
+        
+        // window.location.href = "http://localhost:5000/login"
     }
     return (
         <a className="login-btn" href="#" onClick={doLogin}><p>Login with Spotify</p></a>
