@@ -1016,89 +1016,60 @@ app.post('/api/playlist', async (req, res) => {
                         
                             
                         } catch (error) {
-
-                            console.log("Line 1099");
                             // Display the error message
                             if (error.response) {
-                                console.log("Line 1102");
                                 // If the server responded with a status other than 2xx
                                 console.log('Error Response:', error.response);
                                 console.log('Status:', error.response.status);
                                 console.log('Headers:', error.response.headers);
-
-                                console.log("Line 1108");
                                 
                                 // Safely access error message
                                 if (error.response.data && error.response.data.error && error.response.data.error.message) {
-                                    console.log("Line 1112");
                                     console.log(`Error: ${error.response.data.error.message}`);
                                 } else {
-                                    console.log("Line 1115");
                                     console.log('Error: Unexpected response structure or missing message.');
                                 }
                             } else if (error.request) {
-                                console.log("Line 1119");
                                 // If no response was received
                                 console.log('Error Request:', error.request);
                                 console.log('Error: No response received from the server.');
-                                console.log("Line 1123");
                             } else {
-                                console.log("Line 1125");
                                 // If an error occurred while setting up the request
                                 console.log('Error Message:', error.message);
                                 console.log(`Error: ${error.message}`);
                             }
                         }
                         
-                        console.log("Line 1132");
-
                         
 
                     } catch (error) {
-                        console.log("Line 1137");
                         if (error.response && error.response.data.error === 'invalid_grant') {
-                            console.log("Line 1139");
                             console.error('Refresh token has expired or is invalid.');
                             // You may need to request the user to authenticate again
                         } else {
-                            console.log("Line 1143");
                             console.error('Error refreshing token:', error.response ? error.response.data : error.message);
                         }                   
                     
                     }
 
-                    console.log("Line 1149");
 
                 } catch(err) {
-                    console.log("Line 1152");
                     return res.status(404).send('Playlist Response from Spotify error'); 
                 }
-
-                console.log("Line 1156");
                 
                 
             } catch (error) {
-                console.log("Line 1160");
                 return res.status(404).send('No user with userId found'); 
             }
-            console.log("Line 1163");
         } catch (error) {
-            console.log("Line 1165");
             return res.status(404).send('No preferences found for the current weather condition.'); // Return if no preferences are set for the weather condition
         }
-        console.log("Line 1168");
     } catch (error) {
-        console.log("Line 1170");
         console.error('Error generating Spotify playlist:', error.message); // Log errors
         res.status(500).send('Error generating Spotify playlist'); // Send error response
-        console.log("Line 1173");
     }
 });
 
 app.listen(5000,'0.0.0.0', () => {
     console.log('Server running on port 5000 and listening on all interfaces');
 });
-
-
-
-
